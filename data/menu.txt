@@ -1,0 +1,10 @@
+1,Espresso,2.50,Drink
+2,Cappuccino,3.50,Drink
+3,Latte,3.00,Drink
+4,Hot Chocolate,2.75,Drink
+5,Croissant,1.75,Bakery
+6,Chocolate Muffin,2.00,Bakery
+7,Cheesecake,3.25,Dessert
+8,Tea,2.00,Drink
+9,Fresh Juice,2.50,Drink
+10,Sandwich,4.00,Food

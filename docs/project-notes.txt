@@ -1,0 +1,7 @@
+Cafe Management System project notes:
+
+- Keep source files in src/
+- Keep reusable declarations in include/
+- Store data files in data/
+- Extend with modules like sales, inventory, and staff management
+- Use CMake or g++ to compile the project

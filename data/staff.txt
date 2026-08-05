@@ -1,0 +1,4 @@
+1,John,Barista,1200
+2,Anna,Cashier,1100
+3,Leo,Manager,1800
+4,Maya,Chef,1400
