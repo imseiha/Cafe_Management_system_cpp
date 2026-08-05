@@ -1,7 +1,12 @@
 #include <iostream>
 #include <iomanip>
+
 #include "../includes/MenuManager.h"
 #include "../includes/MenuUI.h"
+#include "../includes/Order.h"
+#include "../includes/Filehandler.h"
+#include "../includes/Filehandler.h"
+// #include "main.cpp"
 
 void addMenuItems(std::vector<Menuitems>& menuItems){
     int id, stock;
@@ -82,4 +87,32 @@ void deleteMenuItem(std::vector<Menuitems>& menuItems){
         }
     }
     std::cout << "Item not found.\n";  // moved outside the loop
+}
+
+void placeOrder(std::vector<Menuitems>& items, std::vector<Order>& orders, int& nextOrderId){
+    int itemId, qty;
+    std::cout << "Enter item Id to odrder : ";
+    std::cin >> itemId;
+    std::cout << "Enter quantity : ";
+    std::cin >> qty;
+
+    for(auto& item : items){
+        if(itemId == item.getId()){
+            if(qty > item.getStock()){
+                std::cout << "Not enough stock! Only " << item.getStock() << "left" << std::endl; 
+                return;
+            }
+            double total = item.getPrice() * qty;
+            item.reduceStock(qty);
+
+            Order newOrder(nextOrderId ++, itemId, qty, total);
+            orders.push_back(newOrder);
+            FileHandler::apppendOrder(ORDER_FILE, newOrder);
+
+            std::cout << "Order placed total $" << total << std::endl;
+            
+            return;
+        }
+        std::cout << "Id items not found" << std::endl;
+    }
 }

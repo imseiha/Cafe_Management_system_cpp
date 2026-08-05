@@ -45,8 +45,10 @@ void showMenuFeature() {
     typeEffect("| 2. Show Menu                 |");
     typeEffect("| 3. Update Menu               |");
     typeEffect("| 4. Delete Menu               |");
-    typeEffect("| 5. Save Data                 |");
-    typeEffect("| 6. Exit                      |");
+    typeEffect("| 5. Order                     |");
+    typeEffect("| 6. Save Data                 |");
+    typeEffect("| 7. Order History             |");
+    typeEffect("| 8. Exit                      |");
 
     std::cout << "+" << std::string(width, '-') << "+" << std::endl;
     std::cout << "Enter your choice : ";

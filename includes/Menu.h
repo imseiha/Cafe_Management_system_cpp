@@ -6,7 +6,7 @@
 #include <sstream>
 #include <iomanip>
 
-const int W_ID = 6, W_NAME = 20, W_PRICE = 10, W_STOCK = 8;
+#include "TableFormat.h"
 
 class Menuitems{
     private:
