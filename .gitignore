@@ -1,5 +1,1 @@
-*.FetchDataFromFile.exe
-*.MenuManagement.exe 
-*.Test.exe 
-*.cafe_system.exe
-*.main.exe
+*.exe
