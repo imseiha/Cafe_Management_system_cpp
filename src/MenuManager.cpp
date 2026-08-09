@@ -2,6 +2,7 @@
 #include <iomanip>
 #include <algorithm>
 #include <string>
+#include <limits>
 
 #include "../includes/MenuManager.h"
 #include "../includes/MenuUI.h"
@@ -12,22 +13,35 @@
 
 //Add items
 void addMenuItems(std::vector<Menuitems>& menuItems){
-    int id, stock;
-    double price;
-    std::string name;
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
-    std::cout << "Enter Product ID: ";
-    std::cin >> id;
-    std::cin.ignore();
-    std::cout << "Enter Product Name: ";
-    std::getline(std::cin, name);
+    printSectionHeader("ADD NEW MENU ITEM");
+    std::cout << std::endl;
+
+    int id;
+    while (true) {
+        id = promptInt("Product ID");
+        bool exists = false;
+        for (const auto& item : menuItems) {
+            if (item.getId() == id) {
+                exists = true;
+                break;
+            }
+        }
+        if (!exists) {
+            break;
+        }
+        std::cout << "  Product ID " << id << " already exists. Please choose another." << std::endl;
+    }
+    std::string name = promptString("Product Name");
+    double price = promptDouble("Price");
+    int stock = promptInt("Stock");
     std::string category = chooseCategory(MEN_CATEGORY);
-    std::cout << "Enter Price : ";
-    std::cin >> price;
-    std::cout << "Enter Product Stock: ";
-    std::cin >> stock;
 
     menuItems.push_back(Menuitems(id, name, price, stock, category));
+
+    std::cout << std::endl;
+    printSectionHeader("ITEM ADDED SUCCESSFULLY");
 }
 
 //Show items
@@ -168,16 +182,15 @@ void placeOrder(std::vector<Menuitems>& items, std::vector<Order>& orders, int& 
 }
 //get category
 std::string chooseCategory(const std::vector<std::string>& categories){
+    std::cout << std::endl;
     for(size_t i = 0; i < categories.size(); i++){
-        std::cout << (i + 1) << "." << categories[i] << std::endl;
+        std::cout << "   " << (i + 1) << ". " << categories[i] << std::endl;
     }
-    int choice;
-    std::cout << "Enter your choice : ";
-    std::cin >> choice;
-
+    int choice = promptInt("Category");
     if(choice >= 1 && choice <= static_cast<int>(categories.size())){
         return categories[choice - 1];
     }
+    std::cout << "  Invalid choice. Defaulting to Uncategorized." << std::endl;
     return "Uncategorized";
 }
 

@@ -2,6 +2,8 @@
 #include <iomanip>
 #include <thread>
 #include <chrono>
+#include <algorithm>
+#include <string>
 
 #include "../includes/MenuUI.h"
 
@@ -60,4 +62,55 @@ void getItemWidths(const Menuitems& item, int& wId, int& wName, int& wPrice, int
     wPrice = std::max((int)std::string("Price").length(), (int)std::to_string(item.getPrice()).length()) + 2;
     wStock = std::max((int)std::string("Stock").length(), (int)std::to_string(item.getStock()).length()) + 2;
     wCategory = std::max((int)std::string("Category").length(), (int)item.getCategory().length()) + 2;
+}
+
+void printSectionHeader(const std::string& title) {
+    const int width = 38;
+    int pad = std::max(0, (width - (int)title.length()) / 2);
+    std::cout << "+" << std::string(width, '-') << "+" << std::endl;
+    std::cout << "|" << std::string(pad, ' ')
+              << title
+              << std::string(width - pad - (int)title.length(), ' ')
+              << "|" << std::endl;
+    std::cout << "+" << std::string(width, '-') << "+" << std::endl;
+}
+
+std::string promptString(const std::string& label) {
+    while (true) {
+        std::cout << "  " << std::left << std::setw(15) << label << ": ";
+        std::string input;
+        std::getline(std::cin, input);
+        if (!input.empty()) {
+            return input;
+        }
+        std::cout << "  Input cannot be empty. Please try again." << std::endl;
+    }
+}
+
+int promptInt(const std::string& label) {
+    while (true) {
+        std::string input = promptString(label);
+        try {
+            size_t pos = 0;
+            int value = std::stoi(input, &pos);
+            if (pos == input.length() && value >= 0) {
+                return value;
+            }
+        } catch (...) {}
+        std::cout << "  Invalid input. Please enter a whole number." << std::endl;
+    }
+}
+
+double promptDouble(const std::string& label) {
+    while (true) {
+        std::string input = promptString(label);
+        try {
+            size_t pos = 0;
+            double value = std::stod(input, &pos);
+            if (pos == input.length() && value >= 0) {
+                return value;
+            }
+        } catch (...) {}
+        std::cout << "  Invalid input. Please enter a number." << std::endl;
+    }
 }
