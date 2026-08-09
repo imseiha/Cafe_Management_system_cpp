@@ -7,11 +7,12 @@
 
 // int wId, wName, wPrice, wStock, wCategory;
 
-// Column widths for the menu table
-void printSeparator(int wId, int wName, int wPrice, int wStock, int wCateory);
-void getItemWidths(const Menuitems& item, int& wId, int& wName, int& wPrice, int& wStock, int& wCategory);
+// Fixed-width table borders
+void printSeparator();
+void printOrderSeparator();
 void typeEffect(const std::string& text, int delayMs = 15);
 void loadingBar();
+void showWelcome();
 void showMenuFeature();
 
 // Banner for sections / input forms

@@ -8,104 +8,106 @@
 #include "../includes/MenuUI.h"
 #include "../includes/Order.h"
 #include "../includes/Filehandler.h"
-#include "../includes/Filehandler.h"
 // #include "main.cpp"
 
 //Add items
 void addMenuItems(std::vector<Menuitems>& menuItems){
+    std::vector<Menuitems> menuitems = FileHandler::loadMenuFromFile(MENU_FILE);
+    // std::vector<Order> orders = FileHandler::loadOrder(ORDER_FILE);
     std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
     printSectionHeader("ADD NEW MENU ITEM");
-    std::cout << std::endl;
+    // std::cout << std::endl;
 
-    int id;
-    while (true) {
-        id = promptInt("Product ID");
-        bool exists = false;
-        for (const auto& item : menuItems) {
-            if (item.getId() == id) {
-                exists = true;
-                break;
-            }
+    std::string category = chooseCategory(MEN_CATEGORY);
+
+    int id = 1;
+    for (const auto& item : menuitems) {
+        if (item.getCategory() == category && item.getId() >= id) {
+            id = item.getId() + 1;
         }
-        if (!exists) {
-            break;
-        }
-        std::cout << "  Product ID " << id << " already exists. Please choose another." << std::endl;
     }
+
     std::string name = promptString("Product Name");
     double price = promptDouble("Price");
     int stock = promptInt("Stock");
-    std::string category = chooseCategory(MEN_CATEGORY);
 
-    menuItems.push_back(Menuitems(id, name, price, stock, category));
+    Menuitems newItem(id, name, price, stock, category);
+    menuItems.push_back(newItem);
+    menuitems.push_back(newItem);
 
     std::cout << std::endl;
+    FileHandler::saveMenuToFile(menuitems, MENU_FILE);
+    std::cout << "  New item ID: " << newItem.formattedId() << std::endl;
     printSectionHeader("ITEM ADDED SUCCESSFULLY");
 }
 
 //Show items
 void showMenuItems(std::vector<Menuitems>& menuItems){
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
-    std::sort(menuItems.begin(), menuItems.end(),[]
-    (const Menuitems& a, const Menuitems b){
-        return a.getCategory() < b.getCategory();
-    });
-
-    int wId = std::string("ID").length();
-    int wName = std::string("Name").length();
-    int wPrice = std::string("Price").length();
-    int wStock = std::string("Stock").length();
-    int wCategory = std::string("Category").length();
-
-    for(const auto& item : menuItems){
-
-        // wId = std::max(wId, (int)std::to_string(item.getId()).length());
-        // wName = std::max(wName, (int)item.getName().length());
-        // wPrice = std::max(wPrice, (int)std::to_string(item.getPrice()).length());
-        // wStock = std::max(wStock, (int)std::to_string(item.getStock()).length());
-        // wCategory = std::max(wCategory, (int)item.getCategory().length());
-
-        getItemWidths(item, wId, wName, wPrice, wStock, wCategory);
+    if (menuItems.empty()) {
+        std::cout << "  No menu items available." << std::endl;
+        return;
     }
-    wId += 2; wName += 2; wPrice += 2; wStock += 2; wCategory += 2;
+
+    std::sort(menuItems.begin(), menuItems.end(),
+    [](const Menuitems& a, const Menuitems& b){
+        if (a.getCategory() != b.getCategory()) {
+            return a.getCategory() < b.getCategory();
+        }
+        return a.getId() < b.getId();
+    });
 
     std::string lastCategory = "";
     for (const auto& item : menuItems) {
-        if(item.getCategory() != lastCategory){
+        if (item.getCategory() != lastCategory) {
+            if (!lastCategory.empty()) {
+                printSeparator();  // close the PREVIOUS group's table
+            }
 
             std::cout << std::endl << "=== " << item.getCategory() << " ===" << std::endl;
 
-            printSeparator(wId, wName, wPrice, wStock, wCategory);
-                std::cout << "|" << std::left << std::setw(wId) << "ID"
-                << "|" << std::left << std::setw(wName) << "Name"
-                << "|" << std::left << std::setw(wPrice) << "Price"
-                << "|" << std::left << std::setw(wStock) << "Stock"
-                << "|" << std::left << std::setw(wCategory) << "Category"
-                << "|" << std::endl;
-            printSeparator(wId, wName, wPrice, wStock, wCategory);
+            printSeparator();
+            std::cout << "|" << centerText("ID", W_ID)
+                    << "|" << centerText("Name", W_NAME)
+                    << "|" << centerText("Price", W_PRICE)
+                    << "|" << centerText("Stock", W_STOCK)
+                    << "|" << centerText("Category", W_CATEGORY)
+                    << "|" << std::endl;
+            printSeparator();
+
             lastCategory = item.getCategory();
         }
-        item.display(wId, wName, wPrice, wStock, wCategory);
+        item.display();
     }
-    // printSeparator(wId, wName, wPrice, wStock, wCategory);
-
+    printSeparator();  // closes the LAST group's table
+        std::cout << "<<< END OF TABLE >>>" << std::endl;
 }
 
 //Update items
 void updateMenuItem(std::vector<Menuitems>& menuItems){
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+
+    std::string category = chooseCategory(MEN_CATEGORY);
+
     int id;
     std::cout << "Enter item ID to update: ";
     std::cin >> id;
     for (auto& item : menuItems) {
-        if (id == item.getId()) {
+        if (id == item.getId() && item.getCategory() == category) {
             std::cout << "Current item details:\n";
 
-            int wId, wName, wPrice, wStock, wCategory;
-            //To get the length of the character
-            getItemWidths(item, wId, wName, wPrice, wStock, wCategory);
-            //display product
-            item.display(wId, wName, wPrice, wStock, wCategory);
+            printSeparator();
+            std::cout << "|" << centerText("ID", W_ID)
+                    << "|" << centerText("Name", W_NAME)
+                    << "|" << centerText("Price", W_PRICE)
+                    << "|" << centerText("Stock", W_STOCK)
+                    << "|" << centerText("Category", W_CATEGORY)
+                    << "|" << std::endl;
+            printSeparator();
+            item.display();
+            printSeparator();
 
             int stock;
             double price;
@@ -122,7 +124,9 @@ void updateMenuItem(std::vector<Menuitems>& menuItems){
             item.setName(name);
             item.setPrice(price);
             item.setStock(stock);
-            std::cout << "Item updated successfully!\n";
+
+            FileHandler::saveMenuToFile(menuItems, MENU_FILE);
+            std::cout << "Item updated successfully!" << std::endl;
             return;
         }
     }
@@ -131,20 +135,38 @@ void updateMenuItem(std::vector<Menuitems>& menuItems){
 
 //Delete items
 void deleteMenuItem(std::vector<Menuitems>& menuItems){
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+
+    std::string category = chooseCategory(MEN_CATEGORY);
+
     int id;
     std::cout << "Enter item ID to delete: ";
     std::cin >> id;
     for (auto i = menuItems.begin(); i != menuItems.end(); ++i) {
-        if (i->getId() == id) {
+        if (i->getId() == id && i->getCategory() == category) {
             std::cout << "Deleting:\n";
 
-            int wId, wName, wPrice, wStock, wCategory;
-            
-            //because i is a interator we use *i to get a acutuall Menuitems object it points to
-            getItemWidths(*i, wId, wName, wPrice, wStock, wCategory);
-            i->display(wId, wName, wPrice, wStock, wCategory);
+            printSeparator();
+            std::cout << "|" << centerText("ID", W_ID)
+                    << "|" << centerText("Name", W_NAME)
+                    << "|" << centerText("Price", W_PRICE)
+                    << "|" << centerText("Stock", W_STOCK)
+                    << "|" << centerText("Category", W_CATEGORY)
+                    << "|" << std::endl;
+            printSeparator();
+            i->display();
+            printSeparator();
+
+            std::string confirm;
+            std::cout << "Are you sure you want to delete this item? (y/n): ";
+            std::cin >> confirm;
+            if (confirm != "y" && confirm != "Y") {
+                std::cout << "De2letion cancelled." << std::endl;
+                return;
+            }
 
             menuItems.erase(i);
+            FileHandler::saveMenuToFile(menuItems, MENU_FILE);
             std::cout << "Item deleted." << std::endl;
             return;
         }
@@ -172,6 +194,7 @@ void placeOrder(std::vector<Menuitems>& items, std::vector<Order>& orders, int& 
             Order newOrder(nextOrderId++, itemId, qty, total);
             orders.push_back(newOrder);
             FileHandler::apppendOrder(ORDER_FILE, newOrder);
+            FileHandler::saveMenuToFile(items, MENU_FILE);
 
             std::cout << "Order placed total $" << total << std::endl;
             
@@ -182,7 +205,7 @@ void placeOrder(std::vector<Menuitems>& items, std::vector<Order>& orders, int& 
 }
 //get category
 std::string chooseCategory(const std::vector<std::string>& categories){
-    std::cout << std::endl;
+    // std::cout << std::endl;
     for(size_t i = 0; i < categories.size(); i++){
         std::cout << "   " << (i + 1) << ". " << categories[i] << std::endl;
     }

@@ -62,7 +62,7 @@ class Menuitems{
         //save to file
         std::string tofile() const {
             std::ostringstream oss;
-            oss << id << "," << name << "," << price << "," << stock;
+            oss << std::setw(4) << std::setfill('0') << id << "," << name << "," << price << "," << stock << "," << category;
             return oss.str();
         }
         // Static method to create a Menuitems object from a string
@@ -83,14 +83,26 @@ class Menuitems{
             // Convert the strings to appropriate types and create a Menuitems object
             return Menuitems(std::stoi(idStr), name, std::stof(priceStr), std::stoi(stockStr), category);
         }
+        std::string formattedId() const {
+            std::ostringstream oss;
+            oss << std::setw(4) << std::setfill('0') << id;
+            return oss.str();
+        }
         //flexible Menu display
-        void display(int wId, int wName, int wPrice, int wStock, int wCategory) const {
-            std::cout << "|" << std::left << std::setw(wId) << id
-                    << "|" << std::left << std::setw(wName) << name
-                    << "|" << std::left << std::fixed << std::setprecision(2)
-                                        << std::setw(wPrice - 1) << price << " "
-                    << "|" << std::left << std::setw(wStock - 1) << stock << " "
-                    << "|" << std::left << std::setw(wCategory - 1) << category << " "
+        void display() const {
+            std::ostringstream priceText;
+            priceText << std::fixed << std::setprecision(2) << price;
+
+            std::string stockText = std::to_string(stock);
+            if (stock < 5) {
+                stockText = "!! " + stockText;
+            }
+
+            std::cout << "|" << centerText(formattedId(), W_ID)
+                    << "|" << centerText(name, W_NAME)
+                    << "|" << centerText(priceText.str(), W_PRICE)
+                    << "|" << centerText(stockText, W_STOCK)
+                    << "|" << centerText(category, W_CATEGORY)
                     << "|" << std::endl;
         }
 };

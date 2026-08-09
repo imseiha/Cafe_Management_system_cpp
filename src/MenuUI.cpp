@@ -7,13 +7,22 @@
 
 #include "../includes/MenuUI.h"
 
-void printSeparator(int wId, int wName, int wPrice, int wStock, int wCategory) {
+void printSeparator() {
     std::cout << "+"
-               << std::string(wId, '-') << "+"
-               << std::string(wName, '-') << "+"
-               << std::string(wPrice, '-') << "+"
-               << std::string(wStock, '-') << "+"
-               << std::string(wCategory, '-') << "+"
+               << std::string(W_ID, '-') << "+"
+               << std::string(W_NAME, '-') << "+"
+               << std::string(W_PRICE, '-') << "+"
+               << std::string(W_STOCK, '-') << "+"
+               << std::string(W_CATEGORY, '-') << "+"
+               << std::endl;
+}
+
+void printOrderSeparator() {
+    std::cout << "+"
+               << std::string(W_ID, '-') << "+"
+               << std::string(W_NAME, '-') << "+"
+               << std::string(W_PRICE, '-') << "+"
+               << std::string(W_STOCK, '-') << "+"
                << std::endl;
 }
 
@@ -34,34 +43,31 @@ void loadingBar() {
     std::cout << std::endl;
 }
 
+void showWelcome() {
+    loadingBar();
+    std::cout << std::endl;
+    printSectionHeader("CAFE MANAGEMENT SYSTEM");
+    std::cout << std::endl;
+}
+
 void showMenuFeature() {
     const int width = 30;
 
-    loadingBar();
-    std::cout << std::endl;
-
     std::cout << "+" << std::string(width, '-') << "+" << std::endl;
-    typeEffect("|         MENU SYSTEM          |");
+    std::cout << "|         MENU SYSTEM          |" << std::endl;
     std::cout << "+" << std::string(width, '-') << "+" << std::endl;
 
-    typeEffect("| 1. Add Menu                  |");
-    typeEffect("| 2. Show Menu                 |");
-    typeEffect("| 3. Update Menu               |");
-    typeEffect("| 4. Delete Menu               |");
-    typeEffect("| 5. Order                     |");
-    typeEffect("| 6. Save Data                 |");
-    typeEffect("| 7. Order History             |");
-    typeEffect("| 8. Exit                      |");
+    std::cout << "| 1. Add Menu                  |" << std::endl;
+    std::cout << "| 2. Show Menu                 |" << std::endl;
+    std::cout << "| 3. Update Menu               |" << std::endl;
+    std::cout << "| 4. Delete Menu               |" << std::endl;
+    // std::cout << "| 5. Order                     |" << std::endl;
+    // std::cout << "| 5. Save Data                 |" << std::endl;
+    // std::cout << "| 7. Order History             |" << std::endl;
+    std::cout << "| 5. Exit                      |" << std::endl;
 
     std::cout << "+" << std::string(width, '-') << "+" << std::endl;
     std::cout << "Enter your choice : ";
-}
-void getItemWidths(const Menuitems& item, int& wId, int& wName, int& wPrice, int& wStock, int& wCategory) {
-    wId    = std::max((int)std::string("ID").length(), (int)std::to_string(item.getId()).length()) + 2;
-    wName  = std::max((int)std::string("Name").length(), (int)item.getName().length()) + 2;
-    wPrice = std::max((int)std::string("Price").length(), (int)std::to_string(item.getPrice()).length()) + 2;
-    wStock = std::max((int)std::string("Stock").length(), (int)std::to_string(item.getStock()).length()) + 2;
-    wCategory = std::max((int)std::string("Category").length(), (int)item.getCategory().length()) + 2;
 }
 
 void printSectionHeader(const std::string& title) {

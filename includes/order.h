@@ -46,11 +46,13 @@ class Order{
         }
 
         void display() const {
-            std::cout << "|" << std::left  << std::setw(W_ID) << orderId
-                    << "|" << std::left  << std::setw(W_NAME) << menuItemsId
-                    << "|" << std::right << std::fixed << std::setprecision(2)
-                                            << std::setw(W_PRICE - 1) << quantity << " "
-                    << "|" << std::right << std::setw(W_STOCK - 1) << totalPrice << " "
+            std::ostringstream priceText;
+            priceText << std::fixed << std::setprecision(2) << totalPrice;
+
+            std::cout << "|" << centerText(std::to_string(orderId), W_ID)
+                    << "|" << centerText(std::to_string(menuItemsId), W_NAME)
+                    << "|" << centerText(std::to_string(quantity), W_PRICE)
+                    << "|" << centerText(priceText.str(), W_STOCK)
                     << "|" << std::endl;
         }
 };

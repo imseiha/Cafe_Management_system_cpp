@@ -1,4 +1,7 @@
-1,Ice Coffee,2.5,10
-2,Sting,2.4,9
-3,Ice Coffee,2,6
-6,Chicken Wing,3,10
+0001,Ice Latte,2,10,Drink
+0002,Ice Latte,1.5,5,Drink
+0003,Black Coffe,1.5,10,Drink
+0004,Coconut Coffe,1.25,10,Drink
+0005,Ice Cola,2.5,10,Drink
+0001,Donut,1.25,10,Pastries
+0002,Num Kong,0.25,100,Pastries

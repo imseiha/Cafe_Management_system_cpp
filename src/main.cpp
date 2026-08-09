@@ -18,14 +18,18 @@ int main(){
         }
     }
 
-    if (menuitems.empty()) {
-        menuitems.push_back(Menuitems(1, "Ice Coffee", 2.50, 10, "Drink"));
-        menuitems.push_back(Menuitems(2, "Sting", 2.4, 9, "Drink"));
-        menuitems.push_back(Menuitems(3, "Ice Coffee", 2.0, 6, "Drink"));
-    }
+    //In one condition that manu has no item
+    // if (menuitems.empty()) {
+    //     menuitems.push_back(Menuitems(1, "Ice Coffee", 2.50, 10, "Drink"));
+    //     menuitems.push_back(Menuitems(2, "Sting", 2.40, 9, "Drink"));
+    //     menuitems.push_back(Menuitems(3, "Croissant", 3.75, 4, "Pastries"));
+    //     menuitems.push_back(Menuitems(4, "Muffin", 2.25, 12, "Pastries"));
+    //     menuitems.push_back(Menuitems(5, "Caca", 1.00, 10, "Drink"));
+    // }
 
     int choice = 0;
-    while (choice != 8) {
+    showWelcome();
+    while (choice != 5) {
         showMenuFeature();
         std::cin >> choice;
 
@@ -36,18 +40,6 @@ int main(){
             case 3: updateMenuItem(menuitems); break;
             case 4: deleteMenuItem(menuitems); break;
             case 5:
-                placeOrder(menuitems, orders, nextOrderId); break;
-            case 6:
-                FileHandler::saveMenuToFile(menuitems, MENU_FILE);
-                FileHandler::saveOrder(ORDER_FILE, orders);
-                std::cout << "Data Saved!!" << std::endl;
-                break;
-            case 7:
-                for(const auto& displayOrder : orders){
-                    displayOrder.display();
-                }
-                break;
-            case 8:
                 std::cout << "Exit Program! Gook luck" << std::endl;
                 break;
             default:
