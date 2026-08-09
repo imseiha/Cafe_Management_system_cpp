@@ -1,3 +1,4 @@
-1,Ice Coffe,2.5,10
-3,Ice Coffe,2,6
-4,Mactcha,2,8
+1,Ice Coffee,2.5,10
+2,Sting,2.4,9
+3,Ice Coffee,2,6
+6,Chicken Wing,3,10

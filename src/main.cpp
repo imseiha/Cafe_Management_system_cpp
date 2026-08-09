@@ -5,7 +5,7 @@
 #include "../includes/MenuManager.h"
 #include "../includes/MenuUI.h"
 #include "../includes/TableFormat.h"
-
+#include "../includes/Category.h"
 
 int main(){
     std::vector<Menuitems> menuitems = FileHandler::loadMenuFromFile(MENU_FILE);
@@ -19,9 +19,9 @@ int main(){
     }
 
     if (menuitems.empty()) {
-        menuitems.push_back(Menuitems(1, "Ice Coffee", 2.50, 10));
-        menuitems.push_back(Menuitems(2, "Sting", 2.4, 9));
-        menuitems.push_back(Menuitems(3, "Ice Coffee", 2.0, 6));
+        menuitems.push_back(Menuitems(1, "Ice Coffee", 2.50, 10, "Drink"));
+        menuitems.push_back(Menuitems(2, "Sting", 2.4, 9, "Drink"));
+        menuitems.push_back(Menuitems(3, "Ice Coffee", 2.0, 6, "Drink"));
     }
 
     int choice = 0;
@@ -32,6 +32,7 @@ int main(){
         switch (choice) {
             case 1: addMenuItems(menuitems); break;
             case 2: showMenuItems(menuitems); break;
+            // case 2: loadMenuFromCategory();
             case 3: updateMenuItem(menuitems); break;
             case 4: deleteMenuItem(menuitems); break;
             case 5:

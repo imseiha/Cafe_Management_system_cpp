@@ -5,12 +5,13 @@
 
 #include "../includes/MenuUI.h"
 
-void printSeparator(char left, char mid, char right) {
-    std::cout << left
-               << std::string(W_ID, '-') << mid
-               << std::string(W_NAME, '-') << mid
-               << std::string(W_PRICE, '-') << mid
-               << std::string(W_STOCK, '-') << right
+void printSeparator(int wId, int wName, int wPrice, int wStock, int wCategory) {
+    std::cout << "+"
+               << std::string(wId, '-') << "+"
+               << std::string(wName, '-') << "+"
+               << std::string(wPrice, '-') << "+"
+               << std::string(wStock, '-') << "+"
+               << std::string(wCategory, '-') << "+"
                << std::endl;
 }
 
@@ -52,4 +53,11 @@ void showMenuFeature() {
 
     std::cout << "+" << std::string(width, '-') << "+" << std::endl;
     std::cout << "Enter your choice : ";
+}
+void getItemWidths(const Menuitems& item, int& wId, int& wName, int& wPrice, int& wStock, int& wCategory) {
+    wId    = std::max((int)std::string("ID").length(), (int)std::to_string(item.getId()).length()) + 2;
+    wName  = std::max((int)std::string("Name").length(), (int)item.getName().length()) + 2;
+    wPrice = std::max((int)std::string("Price").length(), (int)std::to_string(item.getPrice()).length()) + 2;
+    wStock = std::max((int)std::string("Stock").length(), (int)std::to_string(item.getStock()).length()) + 2;
+    wCategory = std::max((int)std::string("Category").length(), (int)item.getCategory().length()) + 2;
 }

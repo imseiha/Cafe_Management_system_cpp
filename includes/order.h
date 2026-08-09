@@ -37,7 +37,6 @@ class Order{
             std::stringstream ss(filename);
             std::string orderId, menuId, quantity, totalPrice;
 
-
             std::getline(ss, orderId, ',');
             std::getline(ss, menuId, ',');
             std::getline(ss, quantity, ',');
