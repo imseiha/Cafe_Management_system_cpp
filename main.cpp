@@ -18,7 +18,7 @@ int main(){
         std::cout << "=======================" << std::endl;
         std::cout << "Enter your option : ";
         std::cin >> option;
-        
+
         // system("cls");
         switch(option){
             case 1:{

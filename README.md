@@ -2,6 +2,7 @@ PLANNED FOLDER STRUCTURE
 
 Cafe_Management_system_cpp/
     README.md                      this file
+    Makefile                       build rules for mingw32 make
     .gitignore                     hides exe and build from git
     main.cpp                       program entry point stays here at root
     shared/                        code used by every module
@@ -37,19 +38,24 @@ RULES WE AGREED ON
 5  All compiled exe files go into build so nothing pollutes the project root
 
 
-SETUP STEPS TO DO LATER
+HOW TO COMPILE AND RUN
 
-1  Create include and src subfolders inside all five module folders
-   shared menu_management staff_management sale_management financial_management
+You need g++ and mingw32 make installed. We use MSYS2 so both are already there
 
-2  Add a .gitignore file containing exactly these two lines
+To compile run this command inside the project root folder
 
-*.exe
-build/
+    -mingw32-make
 
-3  Delete the stray exe files
-   FetchDataFromFile.exe
-   main.exe
-   MenuManagement.exe inside the data folder
+The exe is created at build cafe_system.exe
 
-4  Do not rename anything and do not change any code on the other file (you can change it if nescessary)
+To compile and then run the program use this command instead
+
+    mingw32-make run
+
+Extra command to delete the exe if you want a clean state
+
+    -mingw32-make clean
+
+Note. New cpp files added inside any module src folder are compiled
+automatically because the Makefile uses wildcards
+
