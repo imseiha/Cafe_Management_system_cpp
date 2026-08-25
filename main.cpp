@@ -1,7 +1,12 @@
 #include <iostream>
 #include <windows.h>
+#include "SaleManager.h"
+#include "StaffManager.h"
+#include "MenuManager.h"
+#include "FinanceManager.h"
+
 int main(){
-    int option;
+    int option = 0;
     do{
         std::cout << std::endl;
         std::cout << "=======================" << std::endl;
@@ -13,12 +18,38 @@ int main(){
         std::cout << "=======================" << std::endl;
         std::cout << "Enter your option : ";
         std::cin >> option;
-        system("cls");
+        
+        // system("cls");
         switch(option){
             case 1:{
-
+                SaleManager saleManager;
+                saleManager.run();
+                break;
+            }
+            case 2:{
+                StaffManager staffManager;
+                staffManager.run();
+                break;
+            }
+            case 3:{
+                MenuManager menuManager;
+                menuManager.run();
+                break;
+            }
+            case 4:{
+                FinanceManager financeManager;
+                financeManager.run();
+                break;
+            }
+            case 5:{
+                break;
+            }
+            default:{
+                std::cout << "Invalid option. Please try again." << std::endl;
+                break;
             }
         }
 
     }while(option != 5);
+    return 0;
 }
