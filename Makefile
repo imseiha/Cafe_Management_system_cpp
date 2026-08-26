@@ -1,7 +1,7 @@
 CXX = g++
 CXXFLAGS = -std=c++17
 TARGET = build\cafe_system.exe
-LDFLAGS = -lwininet
+LDFLAGS = -lwininet -lshell32
 
 INCLUDES = -Ishared/include \
            -Imenu_management/include \
