@@ -1,3 +1,16 @@
+// ============================================================
+// StaffManager.cpp
+//
+// This file manages all staff operations:
+//   - Loading and saving staff data from/to file
+//   - CRUD operations (Create, View, Search, Update, Delete)
+//   - Staff login
+//   - Staff management menu
+//
+// File format (pipe-delimited, one staff per line):
+//   id|name|gender|dob|pob|address|phone|email|position|username|password|salary|status
+// ============================================================
+
 #include "../include/StaffManager.h"
 
 #include <iostream>
@@ -9,29 +22,52 @@
 using namespace std;
 
 
-// ==========================================
-// Constructor
-// ==========================================
+// ============================================================
+// HELPER FUNCTION (local to this file)
+// ============================================================
+// Prompts the user for a field update.
+// If the user presses Enter (empty input), keeps the current value.
+// Otherwise, returns the new value entered by the user.
+
+static string updateField(const string& prompt, const string& currentValue)
+{
+    cout << prompt << " (Press Enter to keep '" << currentValue << "'): ";
+
+    string input;
+    getline(cin, input);
+
+    return input.empty() ? currentValue : input;
+}
+
+
+// ============================================================
+// CONSTRUCTOR
+// ============================================================
+// Initializes nextId to 1, then loads existing staff from file.
 
 StaffManager::StaffManager()
 {
     nextId = 1;
-
-    // Load existing staff from file
     loadFromFile();
 }
 
 
-// ==========================================
-// LOAD STAFF FROM FILE
-// ==========================================
+// ============================================================
+// SECTION 1: FILE I/O
+// ============================================================
+
+// ------------------------------------
+// loadFromFile
+// ------------------------------------
+// Reads staff_management/data/staff.txt line by line.
+// Each line is pipe-delimited and creates a Staff object.
+// If the file doesn't exist, starts with empty data.
+// Also calculates nextId as the highest existing ID + 1.
 
 void StaffManager::loadFromFile()
 {
     ifstream file(fileName);
 
-    // If file does not exist,
-    // simply start with empty staff data.
     if (!file.is_open())
     {
         return;
@@ -48,52 +84,33 @@ void StaffManager::loadFromFile()
 
         stringstream ss(line);
 
-        string id;
-        string name;
-        string gender;
-        string date_of_birth;
-        string place_of_birth;
-        string current_address;
-        string phone_number;
-        string email;
-        string position;
-        string username;
-        string password;
-        string salary;
-        string status;
+        string id, name, gender, date_of_birth, place_of_birth;
+        string current_address, phone_number, email, position;
+        string username, password, salary, status;
 
-        getline(ss, id, '|');
-        getline(ss, name, '|');
-        getline(ss, gender, '|');
-        getline(ss, date_of_birth, '|');
-        getline(ss, place_of_birth, '|');
+        getline(ss, id,              '|');
+        getline(ss, name,            '|');
+        getline(ss, gender,          '|');
+        getline(ss, date_of_birth,   '|');
+        getline(ss, place_of_birth,  '|');
         getline(ss, current_address, '|');
-        getline(ss, phone_number, '|');
-        getline(ss, email, '|');
-        getline(ss, position, '|');
-        getline(ss, username, '|');
-        getline(ss, password, '|');
-        getline(ss, salary, '|');
-        getline(ss, status, '|');
+        getline(ss, phone_number,    '|');
+        getline(ss, email,           '|');
+        getline(ss, position,        '|');
+        getline(ss, username,        '|');
+        getline(ss, password,        '|');
+        getline(ss, salary,          '|');
+        getline(ss, status,          '|');
 
         try
         {
             int staffId = stoi(id);
 
             Staff staff(
-                staffId,
-                name,
-                gender,
-                date_of_birth,
-                place_of_birth,
-                current_address,
-                phone_number,
-                email,
-                position,
-                username,
-                password,
-                salary,
-                status
+                staffId, name, gender, date_of_birth,
+                place_of_birth, current_address, phone_number,
+                email, position, username, password,
+                salary, status
             );
 
             staffData.push_back(staff);
@@ -113,9 +130,11 @@ void StaffManager::loadFromFile()
 }
 
 
-// ==========================================
-// SAVE STAFF TO FILE
-// ==========================================
+// ------------------------------------
+// saveToFile
+// ------------------------------------
+// Writes all staff data back to staff.txt.
+// Overwrites the entire file with current vector contents.
 
 void StaffManager::saveToFile()
 {
@@ -129,18 +148,18 @@ void StaffManager::saveToFile()
 
     for (const auto& staff : staffData)
     {
-        file << staff.getId() << "|"
-             << staff.getName() << "|"
-             << staff.getGender() << "|"
-             << staff.getDateOfBirth() << "|"
-             << staff.getPlaceOfBirth() << "|"
+        file << staff.getId()            << "|"
+             << staff.getName()          << "|"
+             << staff.getGender()        << "|"
+             << staff.getDateOfBirth()   << "|"
+             << staff.getPlaceOfBirth()  << "|"
              << staff.getCurrentAddress() << "|"
-             << staff.getPhoneNumber() << "|"
-             << staff.getEmail() << "|"
-             << staff.getPosition() << "|"
-             << staff.getUsername() << "|"
-             << staff.getPassword() << "|"
-             << staff.getSalary() << "|"
+             << staff.getPhoneNumber()   << "|"
+             << staff.getEmail()         << "|"
+             << staff.getPosition()      << "|"
+             << staff.getUsername()      << "|"
+             << staff.getPassword()      << "|"
+             << staff.getSalary()        << "|"
              << staff.getStatus()
              << "\n";
     }
@@ -149,9 +168,16 @@ void StaffManager::saveToFile()
 }
 
 
-// ==========================================
-// FIND STAFF BY ID
-// ==========================================
+// ============================================================
+// SECTION 2: FIND STAFF
+// ============================================================
+
+// ------------------------------------
+// findStaffById
+// ------------------------------------
+// Searches staffData for a staff member with the given ID.
+// Returns a pointer to the Staff object if found, nullptr otherwise.
+// This is a private helper used by updateStaff and deleteStaff.
 
 Staff* StaffManager::findStaffById(int id)
 {
@@ -167,9 +193,14 @@ Staff* StaffManager::findStaffById(int id)
 }
 
 
-// ==========================================
-// 1. VIEW STAFF
-// ==========================================
+// ============================================================
+// SECTION 3: CRUD OPERATIONS
+// ============================================================
+
+// ------------------------------------
+// viewStaff
+// ------------------------------------
+// Displays all staff members in the system.
 
 void StaffManager::viewStaff()
 {
@@ -191,9 +222,12 @@ void StaffManager::viewStaff()
 }
 
 
-// ==========================================
-// 2. CREATE STAFF
-// ==========================================
+// ------------------------------------
+// createStaff
+// ------------------------------------
+// Prompts the user for all staff fields, validates input,
+// checks for duplicate username, creates the Staff object,
+// adds it to the vector, and saves to file.
 
 void StaffManager::createStaff()
 {
@@ -201,18 +235,9 @@ void StaffManager::createStaff()
     cout << "              CREATE STAFF\n";
     cout << "==========================================\n";
 
-    string name;
-    string gender;
-    string date_of_birth;
-    string place_of_birth;
-    string current_address;
-    string phone_number;
-    string email;
-    string position;
-    string username;
-    string password;
-    string salary;
-    string status;
+    string name, gender, date_of_birth, place_of_birth;
+    string current_address, phone_number, email, position;
+    string username, password, salary, status;
 
     cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
@@ -253,23 +278,15 @@ void StaffManager::createStaff()
     getline(cin, status);
 
 
-    // ======================================
-    // VALIDATION
-    // ======================================
+    // --- Validation: all fields required ---
 
     if (
-        name.empty() ||
-        gender.empty() ||
-        date_of_birth.empty() ||
-        place_of_birth.empty() ||
-        current_address.empty() ||
-        phone_number.empty() ||
-        email.empty() ||
-        position.empty() ||
-        username.empty() ||
-        password.empty() ||
-        salary.empty() ||
-        status.empty()
+        name.empty()            || gender.empty()       ||
+        date_of_birth.empty()   || place_of_birth.empty()||
+        current_address.empty() || phone_number.empty()  ||
+        email.empty()           || position.empty()      ||
+        username.empty()        || password.empty()      ||
+        salary.empty()          || status.empty()
     )
     {
         cout << "\nInvalid input!\n";
@@ -278,9 +295,7 @@ void StaffManager::createStaff()
     }
 
 
-    // ======================================
-    // CHECK DUPLICATE USERNAME
-    // ======================================
+    // --- Validation: username must be unique ---
 
     for (const auto& staff : staffData)
     {
@@ -293,37 +308,19 @@ void StaffManager::createStaff()
     }
 
 
-    // ======================================
-    // CREATE STAFF OBJECT
-    // ======================================
+    // --- Create Staff and save ---
 
     Staff newStaff(
-        nextId,
-        name,
-        gender,
-        date_of_birth,
-        place_of_birth,
-        current_address,
-        phone_number,
-        email,
-        position,
-        username,
-        password,
-        salary,
-        status
+        nextId, name, gender, date_of_birth,
+        place_of_birth, current_address, phone_number,
+        email, position, username, password,
+        salary, status
     );
 
     staffData.push_back(newStaff);
-
     nextId++;
 
-
-    // ======================================
-    // SAVE TO FILE
-    // ======================================
-
     saveToFile();
-
 
     cout << "\nStaff created successfully!\n";
     cout << "Staff ID: " << newStaff.getId() << endl;
@@ -331,9 +328,12 @@ void StaffManager::createStaff()
 }
 
 
-// ==========================================
-// 3. UPDATE STAFF
-// ==========================================
+// ------------------------------------
+// updateStaff
+// ------------------------------------
+// Finds a staff member by ID, shows current info,
+// then lets the user update each field (press Enter to skip).
+// Uses the updateField() helper to avoid repeating code.
 
 void StaffManager::updateStaff()
 {
@@ -354,137 +354,46 @@ void StaffManager::updateStaff()
         return;
     }
 
-
     cout << "\nCurrent Staff Information:";
     staff->display();
 
-
     cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
-    string input;
+
+    // --- Update each field (Enter to keep current value) ---
+
+    string name            = updateField("Enter new Name",            staff->getName());
+    string gender          = updateField("Enter new Gender",          staff->getGender());
+    string date_of_birth   = updateField("Enter new Date of Birth",   staff->getDateOfBirth());
+    string place_of_birth  = updateField("Enter new Place of Birth",  staff->getPlaceOfBirth());
+    string current_address = updateField("Enter new Current Address", staff->getCurrentAddress());
+    string phone_number    = updateField("Enter new Phone Number",    staff->getPhoneNumber());
+    string email           = updateField("Enter new Email",           staff->getEmail());
+    string position        = updateField("Enter new Position",        staff->getPosition());
+    string username        = updateField("Enter new Username",        staff->getUsername());
+    string password        = updateField("Enter new Password",        staff->getPassword());
+    string salary          = updateField("Enter new Salary",          staff->getSalary());
+    string status          = updateField("Enter new Status",          staff->getStatus());
 
 
-    cout << "\nEnter new Name";
-    cout << " (Press Enter to keep current): ";
-    getline(cin, input);
+    // --- Apply updates to the staff object ---
 
-    if (!input.empty())
-    {
-        staff->setName(input);
-    }
-
-
-    cout << "Enter new Gender";
-    cout << " (Press Enter to keep current): ";
-    getline(cin, input);
-
-    if (!input.empty())
-    {
-        staff->setGender(input);
-    }
+    staff->setName(name);
+    staff->setGender(gender);
+    staff->setDateOfBirth(date_of_birth);
+    staff->setPlaceOfBirth(place_of_birth);
+    staff->setCurrentAddress(current_address);
+    staff->setPhoneNumber(phone_number);
+    staff->setEmail(email);
+    staff->setPosition(position);
+    staff->setUsername(username);
+    staff->setPassword(password);
+    staff->setSalary(salary);
+    staff->setStatus(status);
 
 
-    cout << "Enter new Date of Birth";
-    cout << " (Press Enter to keep current): ";
-    getline(cin, input);
+    // --- Save ---
 
-    if (!input.empty())
-    {
-        staff->setDateOfBirth(input);
-    }
-
-
-    cout << "Enter new Place of Birth";
-    cout << " (Press Enter to keep current): ";
-    getline(cin, input);
-
-    if (!input.empty())
-    {
-        staff->setPlaceOfBirth(input);
-    }
-
-
-    cout << "Enter new Current Address";
-    cout << " (Press Enter to keep current): ";
-    getline(cin, input);
-
-    if (!input.empty())
-    {
-        staff->setCurrentAddress(input);
-    }
-
-
-    cout << "Enter new Phone Number";
-    cout << " (Press Enter to keep current): ";
-    getline(cin, input);
-
-    if (!input.empty())
-    {
-        staff->setPhoneNumber(input);
-    }
-
-
-    cout << "Enter new Email";
-    cout << " (Press Enter to keep current): ";
-    getline(cin, input);
-
-    if (!input.empty())
-    {
-        staff->setEmail(input);
-    }
-
-
-    cout << "Enter new Position";
-    cout << " (Press Enter to keep current): ";
-    getline(cin, input);
-
-    if (!input.empty())
-    {
-        staff->setPosition(input);
-    }
-
-
-    cout << "Enter new Username";
-    cout << " (Press Enter to keep current): ";
-    getline(cin, input);
-
-    if (!input.empty())
-    {
-        staff->setUsername(input);
-    }
-
-
-    cout << "Enter new Password";
-    cout << " (Press Enter to keep current): ";
-    getline(cin, input);
-
-    if (!input.empty())
-    {
-        staff->setPassword(input);
-    }
-
-
-    cout << "Enter new Salary";
-    cout << " (Press Enter to keep current): ";
-    getline(cin, input);
-
-    if (!input.empty())
-    {
-        staff->setSalary(input);
-    }
-
-
-    cout << "Enter new Status";
-    cout << " (Press Enter to keep current): ";
-    getline(cin, input);
-
-    if (!input.empty())
-    {
-        staff->setStatus(input);
-    }
-
-
-    // Save updated data
     saveToFile();
 
     cout << "\nStaff updated successfully!\n";
@@ -492,9 +401,11 @@ void StaffManager::updateStaff()
 }
 
 
-// ==========================================
-// 4. DELETE STAFF
-// ==========================================
+// ------------------------------------
+// deleteStaff
+// ------------------------------------
+// Finds a staff member by ID, shows their info,
+// asks for confirmation, then deletes and saves.
 
 void StaffManager::deleteStaff()
 {
@@ -538,8 +449,6 @@ void StaffManager::deleteStaff()
     if (confirm == 'Y' || confirm == 'y')
     {
         staffData.erase(it);
-
-        // Rewrite file after deleting
         saveToFile();
 
         cout << "\nStaff deleted successfully!\n";
@@ -552,9 +461,11 @@ void StaffManager::deleteStaff()
 }
 
 
-// ==========================================
-// 5. SEARCH STAFF
-// ==========================================
+// ------------------------------------
+// searchStaff
+// ------------------------------------
+// Searches staff by keyword across multiple fields:
+// ID, Name, Gender, Phone, Email, Position.
 
 void StaffManager::searchStaff()
 {
@@ -568,7 +479,6 @@ void StaffManager::searchStaff()
         return;
     }
 
-
     cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
     string keyword;
@@ -579,23 +489,20 @@ void StaffManager::searchStaff()
 
     bool found = false;
 
-
     for (const auto& staff : staffData)
     {
         string id = to_string(staff.getId());
 
-
         if (
-            id == keyword ||
-            staff.getName().find(keyword) != string::npos ||
-            staff.getGender().find(keyword) != string::npos ||
+            id.find(keyword)                   != string::npos ||
+            staff.getName().find(keyword)       != string::npos ||
+            staff.getGender().find(keyword)     != string::npos ||
             staff.getPhoneNumber().find(keyword) != string::npos ||
-            staff.getEmail().find(keyword) != string::npos ||
-            staff.getPosition().find(keyword) != string::npos
+            staff.getEmail().find(keyword)      != string::npos ||
+            staff.getPosition().find(keyword)   != string::npos
         )
         {
             staff.display();
-
             found = true;
         }
     }
@@ -608,9 +515,15 @@ void StaffManager::searchStaff()
 }
 
 
-// ==========================================
-// STAFF LOGIN
-// ==========================================
+// ============================================================
+// SECTION 4: AUTHENTICATION
+// ============================================================
+
+// ------------------------------------
+// staffLogin
+// ------------------------------------
+// Prompts for username and password, searches staffData,
+// and displays the matched staff member's profile.
 
 void StaffManager::staffLogin()
 {
@@ -663,9 +576,15 @@ void StaffManager::staffLogin()
 }
 
 
-// ==========================================
-// STAFF MANAGEMENT MENU
-// ==========================================
+// ============================================================
+// SECTION 5: MENU
+// ============================================================
+
+// ------------------------------------
+// staffMenu
+// ------------------------------------
+// Displays the Staff Management menu and handles user choice.
+// This is the main entry point called from main.cpp.
 
 void StaffManager::staffMenu()
 {
@@ -693,29 +612,12 @@ void StaffManager::staffMenu()
 
         switch (choice)
         {
-            case 1:
-                staffLogin();
-                break;
-
-            case 2:
-                viewStaff();
-                break;
-
-            case 3:
-                createStaff();
-                break;
-
-            case 4:
-                updateStaff();
-                break;
-
-            case 5:
-                deleteStaff();
-                break;
-
-            case 6:
-                searchStaff();
-                break;
+            case 1: staffLogin();   break;
+            case 2: viewStaff();    break;
+            case 3: createStaff();  break;
+            case 4: updateStaff();  break;
+            case 5: deleteStaff();  break;
+            case 6: searchStaff();  break;
 
             case 7:
                 cout << "\nExiting Staff Management...\n";
