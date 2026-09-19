@@ -1,0 +1,24 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "C/C++ Runner: Debug Session",
+      "type": "cppdbg",
+      "request": "launch",
+      "args": [],
+      "stopAtEntry": false,
+      "externalConsole": true,
+      "cwd": "d:/ITE_Y1/ITE_Y1_Semester2/Cpp_Basic_Programming_Language/Mini_project_Cafe`_Management_System_cpp/Cafe_Management_system_cpp",
+      "program": "d:/ITE_Y1/ITE_Y1_Semester2/Cpp_Basic_Programming_Language/Mini_project_Cafe`_Management_System_cpp/Cafe_Management_system_cpp/build/Debug/outDebug",
+      "MIMode": "gdb",
+      "miDebuggerPath": "gdb",
+      "setupCommands": [
+        {
+          "description": "Enable pretty-printing for gdb",
+          "text": "-enable-pretty-printing",
+          "ignoreFailures": true
+        }
+      ]
+    }
+  ]
+}
