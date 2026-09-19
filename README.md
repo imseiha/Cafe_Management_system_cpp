@@ -1,5 +1,15 @@
 PLANNED FOLDER STRUCTURE
 
+//To run my staff Management
+ g++ -std=c++17 main.cpp staff_management/src/Auth.cpp staff_management/src/Staff.cpp staff_management/src/StaffManager.cpp -Istaff_management/include -o cafe_app.exe
+
+ or you can
+ 
+ You can shorten your compile command to g++ -std=c++17 main.cpp staff_management/src/*.cpp -Istaff_management/include -o cafe_app.exe
+
+ ./cafe_app.exe
+
+
 Cafe_Management_system_cpp/
     README.md                      this file
     Makefile                       build rules for mingw32 make
