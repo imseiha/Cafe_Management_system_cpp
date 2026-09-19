@@ -14,12 +14,16 @@ private:
     void loadFromFile();
     void saveToFile();
     void addItem();
-    void viewItems();
     void updateItem();
     void deleteItem();
     void exportToExcel();
 
 public:
+    MenuManager();
+
+    void viewItems();
+    bool getItemById(int id, MenuItem& item) const;
+    bool reduceStock(int itemId, int quantity);
     void run();
 };
 

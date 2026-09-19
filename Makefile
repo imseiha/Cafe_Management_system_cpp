@@ -6,12 +6,14 @@ LDFLAGS = -lwininet -lshell32
 INCLUDES = -Imenu_management/include \
            -Istaff_management/include \
            -Isale_management/include \
+           -Iorder_management/include \
            -Ifinancial_management/include
 
 SRCS = main.cpp \
        $(wildcard menu_management/src/*.cpp) \
        $(wildcard staff_management/src/*.cpp) \
        $(wildcard sale_management/src/*.cpp) \
+       $(wildcard order_management/src/*.cpp) \
        $(wildcard financial_management/src/*.cpp)
 
 $(TARGET): $(SRCS)

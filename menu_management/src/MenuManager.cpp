@@ -17,6 +17,10 @@ static std::string csvField(const std::string& value) {
     return "\"" + escaped + "\"";
 }
 
+MenuManager::MenuManager() {
+    loadFromFile();
+}
+
 void MenuManager::run() {
     loadFromFile();
     int option = 0;
@@ -172,6 +176,30 @@ void MenuManager::viewItems() {
     for (const MenuItem& item : items) {
         item.display();
     }
+}
+
+bool MenuManager::getItemById(int id, MenuItem& item) const {
+    for (const MenuItem& candidate : items) {
+        if (candidate.getId() == id) {
+            item = candidate;
+            return true;
+        }
+    }
+    return false;
+}
+
+bool MenuManager::reduceStock(int itemId, int quantity) {
+    for (MenuItem& item : items) {
+        if (item.getId() == itemId) {
+            if (quantity > item.getStock()) {
+                return false;
+            }
+            item.setStock(item.getStock() - quantity);
+            saveToFile();
+            return true;
+        }
+    }
+    return false;
 }
 
 void MenuManager::updateItem() {
