@@ -6,6 +6,7 @@
 #include <limits>
 #include "OrderManager.h"
 #include "MenuManager.h"
+#include "Receipt.h"
 
 static std::string currentTimestamp() {
     std::time_t now = std::time(nullptr);
@@ -29,7 +30,8 @@ void OrderManager::run() {
         std::cout << "1.Place Order" << std::endl;
         std::cout << "2.View Orders" << std::endl;
         std::cout << "3.Delete Order" << std::endl;
-        std::cout << "4.Back" << std::endl;
+        std::cout << "4.View All Receipts" << std::endl;
+        std::cout << "5.Back" << std::endl;
         std::cout << "============================" << std::endl;
         std::cout << "Enter your option : ";
         if (!(std::cin >> option)) {
@@ -56,6 +58,10 @@ void OrderManager::run() {
                 break;
             }
             case 4: {
+                viewAllReceipts();
+                break;
+            }
+            case 5: {
                 break;
             }
             default: {
@@ -63,7 +69,7 @@ void OrderManager::run() {
                 break;
             }
         }
-    } while (option != 4);
+    } while (option != 5);
 }
 
 void OrderManager::loadFromFile() {
@@ -179,6 +185,13 @@ void OrderManager::placeOrder() {
 
     saveToFile();
     std::cout << "Order placed successfully with ID " << std::setfill('0') << std::setw(4) << nextId << std::setfill(' ') << ". Total : " << total << std::endl;
+
+    std::cout << std::endl;
+    std::vector<Order> bill;
+    bill.push_back(orders.back());
+    Receipt::print(bill);
+    Receipt::saveToFile(bill, receiptsFilename);
+    std::cout << "Receipt saved to " << receiptsFilename << std::endl;
 }
 
 void OrderManager::viewOrders() {
@@ -216,4 +229,10 @@ void OrderManager::deleteOrder() {
         }
     }
     std::cout << "Order with ID " << id << " not found." << std::endl;
+}
+
+void OrderManager::viewAllReceipts() {
+    std::cout << std::endl;
+    std::cout << "===== All Receipts =====" << std::endl;
+    Receipt::viewFromFile(receiptsFilename);
 }
