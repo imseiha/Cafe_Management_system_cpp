@@ -1,0 +1,2 @@
+1|Reth Chhaiya|Male|27/Jan/2007|KonDal|Phnom Penh|0965184321|rethchhaiya@gmail.com|Admin|Reth Chhaiya|19062007|150|Active
+2|Mon Manith|Male|12/11|Takeo|Phnom Penh|0315666392|mmmm@|Staff|Manith|123456|200|Active
