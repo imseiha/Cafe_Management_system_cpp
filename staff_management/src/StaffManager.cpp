@@ -591,7 +591,7 @@ bool StaffManager::authenticate(Staff& authenticatedStaff, bool requireAdmin)
             }
             if (!requireAdmin && position == "admin")
             {
-                std::cout << "\nPlease use Login As Admin for this account.\n";
+                std::cout << "\nInvalid Username or Password!\n";
                 return false;
             }
             authenticatedStaff = staff;

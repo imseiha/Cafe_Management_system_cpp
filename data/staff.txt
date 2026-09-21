@@ -1,3 +1,5 @@
-1|Reth Chhaiya|Male|27/Jan/2007|KonDal|Phnom Penh|0965184321|rethchhaiya@gmail.com|Admin|Reth Chhaiya|19062007|150|Active
+1|Reth Chhaiya|Male|27/Jan/2007|KonDal|Phnom Penh|0965184321|rethchhaiya@gmail.com|Admin|pozzsmos|12345|250|Active
 2|Reth Chhaiya|Male|27 Jan 2007|Kandal Provine|Phnom Penh|0965184321|rethchhaiya@gmail.com|Staff|astrox|27012007|150|Active
 3|Mon Manith|Male|1 Jan 2008|1 Jan 2008|Phnom Penh|0315666392|manith@gmail.com|Admin|Manith|123456|1500|Active
+4|Moung Seyha|Male|12/03/2006|Kampot|Phnom Penh|0123456789|seyha@gmail.com|Staff|seyha|123456|1000|Active
+5|Dalis|Male|12/02/2006|Kandal|Phnom Penh|1234567890|dalis@gmail.com|Admin|dalis|123456|500|Active

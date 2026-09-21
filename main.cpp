@@ -56,11 +56,10 @@ void staffAuthenticationMenu() {
     StaffManager manager;
     for (;;) {
         std::cout << "\n========================================\nSTAFF ACCOUNT\n========================================\n";
-        std::cout << "1. Login\n2. Register\n3. Back\nEnter your choice: ";
+        std::cout << "1. Login\n2. Back\nEnter your choice: ";
         int choice;
-        if (!readChoice(choice, 1, 3)) { if (std::cin.eof()) return; continue; }
+        if (!readChoice(choice, 1, 2)) { if (std::cin.eof()) return; continue; }
         if (choice == 1) { Staff staff; if (manager.authenticate(staff, false)) staffDashboard(staff); }
-        else if (choice == 2) manager.createStaff("Staff");
         else return;
     }
 }
