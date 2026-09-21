@@ -11,7 +11,7 @@ private:
 
     int nextId;
 
-    const std::string fileName = "staff_management/data/staff.txt";
+    const std::string fileName = "data/staff.txt";
 
     void loadFromFile();
     void saveToFile();

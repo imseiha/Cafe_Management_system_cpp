@@ -58,7 +58,7 @@ StaffManager::StaffManager()
 // ------------------------------------
 // loadFromFile
 // ------------------------------------
-// Reads staff_management/data/staff.txt line by line.
+// Reads data/staff.txt line by line.
 // Each line is pipe-delimited and creates a Staff object.
 // If the file doesn't exist, starts with empty data.
 // Also calculates nextId as the highest existing ID + 1.
