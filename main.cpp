@@ -73,7 +73,7 @@ void adminDashboard(const Staff& admin) {
         if (choice == 1) { StaffManager manager; manager.staffMenu(); }
         else if (choice == 2) { MenuManager manager; manager.run(); }
         else if (choice == 3) { SaleManager manager; manager.run(); }
-        else if (choice == 4) { FinanceManager manager; manager.run(); }
+        else if (choice == 4) { FinancialManager manager; manager.run(); }
         else if (choice == 5) viewMyInformation(admin);
         else return;
     }
