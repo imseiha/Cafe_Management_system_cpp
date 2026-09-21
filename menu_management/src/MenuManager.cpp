@@ -92,6 +92,7 @@ void MenuManager::loadFromFile() {
         std::string token;
         int id = 0;
         double price = 0.0;
+        double productCost = 0.0;
         int stock = 0;
         std::string name;
         std::string category;
@@ -104,14 +105,23 @@ void MenuManager::loadFromFile() {
             std::getline(ss, token, '|');
             price = std::stod(token);
             if (std::getline(ss, token, '|')) {
-                stock = std::stoi(token);
+                std::string stockToken;
+                if (std::getline(ss, stockToken, '|')) {
+                    productCost = std::stod(token);
+                    stock = std::stoi(stockToken);
+                } else {
+                    // Old records used id|name|category|price|stock and have no product cost.
+                    stock = std::stoi(token);
+                }
+            } else {
+                throw std::invalid_argument("missing stock");
             }
         } catch (const std::exception&) {
             std::cout << "Warning: skipping corrupted line in " << filename << "." << std::endl;
             continue;
         }
 
-        items.push_back(MenuItem(id, name, category, price, stock));
+        items.push_back(MenuItem(id, name, category, price, productCost, stock));
     }
     file.close();
 }
@@ -132,6 +142,7 @@ void MenuManager::addItem() {
     std::string name;
     std::string category;
     double price = 0.0;
+    double productCost = 0.0;
     int stock = 0;
 
     int nextId = 0;
@@ -147,6 +158,13 @@ void MenuManager::addItem() {
     std::getline(std::cin, name);
     std::cout << "Enter category : ";
     std::getline(std::cin, category);
+    std::cout << "Enter product cost : ";
+    if (!(std::cin >> productCost)) {
+        std::cin.clear();
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        std::cout << "Invalid product cost. Item not added." << std::endl;
+        return;
+    }
     std::cout << "Enter price : ";
     if (!(std::cin >> price)) {
         std::cin.clear();
@@ -162,7 +180,7 @@ void MenuManager::addItem() {
         return;
     }
 
-    items.push_back(MenuItem(nextId, name, category, price, stock));
+    items.push_back(MenuItem(nextId, name, category, price, productCost, stock));
     saveToFile();
     std::cout << "Item added successfully with ID " << nextId << "." << std::endl;
 }
@@ -172,7 +190,7 @@ void MenuManager::viewItems() {
         std::cout << "No menu items found." << std::endl;
         return;
     }
-    std::cout << "ID\tName\tCategory\tPrice\tStock" << std::endl;
+    std::cout << "ID\tName\tCategory\tPrice\tProduct Cost\tStock" << std::endl;
     for (const MenuItem& item : items) {
         item.display();
     }
@@ -222,6 +240,7 @@ void MenuManager::updateItem() {
             std::string name;
             std::string category;
             double price = 0.0;
+            double productCost = 0.0;
             int stock = 0;
 
             std::cout << "Enter new name : ";
@@ -236,6 +255,13 @@ void MenuManager::updateItem() {
                 std::cout << "Invalid price. Item not updated." << std::endl;
                 return;
             }
+            std::cout << "Enter new product cost : ";
+            if (!(std::cin >> productCost)) {
+                std::cin.clear();
+                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+                std::cout << "Invalid product cost. Item not updated." << std::endl;
+                return;
+            }
             std::cout << "Enter new stock : ";
             if (!(std::cin >> stock)) {
                 std::cin.clear();
@@ -247,6 +273,7 @@ void MenuManager::updateItem() {
             item.setName(name);
             item.setCategory(category);
             item.setPrice(price);
+            item.setProductCost(productCost);
             item.setStock(stock);
             saveToFile();
             std::cout << "Item updated successfully." << std::endl;
@@ -295,12 +322,13 @@ void MenuManager::exportToExcel() {
     }
 
     file << "\xEF\xBB\xBF";
-    file << "ID,Name,Category,Price,Stock" << std::endl;
+    file << "ID,Name,Category,Price,Product Cost,Stock" << std::endl;
     for (const MenuItem& item : items) {
         file << item.getId() << ","
              << csvField(item.getName()) << ","
              << csvField(item.getCategory()) << ","
              << std::fixed << std::setprecision(2) << item.getPrice() << ","
+             << std::fixed << std::setprecision(2) << item.getProductCost() << ","
              << item.getStock() << std::endl;
     }
     file.close();

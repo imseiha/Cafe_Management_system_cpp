@@ -2,10 +2,10 @@
 #include <sstream>
 #include "MenuItem.h"
 
-MenuItem::MenuItem() : id(0), name(""), category(""), price(0.0), stock(0) {}
+MenuItem::MenuItem() : id(0), name(""), category(""), price(0.0), productCost(0.0), stock(0) {}
 
-MenuItem::MenuItem(int id, const std::string& name, const std::string& category, double price, int stock)
-    : id(id), name(name), category(category), price(price), stock(stock) {}
+MenuItem::MenuItem(int id, const std::string& name, const std::string& category, double price, double productCost, int stock)
+    : id(id), name(name), category(category), price(price), productCost(productCost), stock(stock) {}
 
 int MenuItem::getId() const {
     return id;
@@ -21,6 +21,10 @@ std::string MenuItem::getCategory() const {
 
 double MenuItem::getPrice() const {
     return price;
+}
+
+double MenuItem::getProductCost() const {
+    return productCost;
 }
 
 int MenuItem::getStock() const {
@@ -43,16 +47,20 @@ void MenuItem::setPrice(double price) {
     this->price = price;
 }
 
+void MenuItem::setProductCost(double productCost) {
+    this->productCost = productCost;
+}
+
 void MenuItem::setStock(int stock) {
     this->stock = stock;
 }
 
 std::string MenuItem::toFileString() const {
     std::ostringstream oss;
-    oss << id << "|" << name << "|" << category << "|" << price << "|" << stock;
+    oss << id << "|" << name << "|" << category << "|" << price << "|" << productCost << "|" << stock;
     return oss.str();
 }
 
 void MenuItem::display() const {
-    std::cout << id << "\t" << name << "\t" << category << "\t" << price << "\t" << stock << std::endl;
+    std::cout << id << "\t" << name << "\t" << category << "\t" << price << "\t" << productCost << "\t" << stock << std::endl;
 }
