@@ -34,6 +34,7 @@ void viewMyInformation(const Staff& staff) {
               << "\nEmail              : " << staff.getEmail()
               << "\nPosition           : " << staff.getPosition()
               << "\nUsername           : " << staff.getUsername()
+              << "\nPassword           : " << staff.getPassword()
               << "\nSalary             : " << staff.getSalary()
               << "\nStatus             : " << staff.getStatus() << "\n";
     waitForEnter();
@@ -64,16 +65,17 @@ void staffAuthenticationMenu() {
     }
 }
 
-void adminDashboard() {
+void adminDashboard(const Staff& admin) {
     for (;;) {
         std::cout << "\n========================================\nADMIN DASHBOARD\n========================================\n";
-        std::cout << "1. Staff Management\n2. Menu Management\n3. Sale Management\n4. Finance Management\n5. Logout\nEnter your choice: ";
+        std::cout << "1. Staff Management\n2. Menu Management\n3. Sale Management\n4. Finance Management\n5. My Information\n6. Logout\nEnter your choice: ";
         int choice;
-        if (!readChoice(choice, 1, 5)) { if (std::cin.eof()) return; continue; }
+        if (!readChoice(choice, 1, 6)) { if (std::cin.eof()) return; continue; }
         if (choice == 1) { StaffManager manager; manager.staffMenu(); }
         else if (choice == 2) { MenuManager manager; manager.run(); }
         else if (choice == 3) { SaleManager manager; manager.run(); }
         else if (choice == 4) { FinanceManager manager; manager.run(); }
+        else if (choice == 5) viewMyInformation(admin);
         else return;
     }
 }
@@ -82,7 +84,7 @@ void adminLogin() {
     StaffManager manager;
     std::cout << "\n========================================\nADMIN LOGIN\n========================================\n";
     Staff admin;
-    if (manager.authenticate(admin, true)) adminDashboard();
+    if (manager.authenticate(admin, true)) adminDashboard(admin);
 }
 }
 
