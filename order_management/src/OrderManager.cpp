@@ -21,8 +21,28 @@ static std::string currentTimestamp() {
     return oss.str();
 }
 
-void OrderManager::run() {
+void OrderManager::run(bool staffMode, int staffId) {
     loadFromFile();
+    if (staffMode) {
+        std::vector<Order> bill;
+        char anotherOrder = 'N';
+        do {
+            if (!placeOrder(staffId)) return;
+            bill.push_back(orders.back());
+            std::cout << "\nDo you want to make another order? (Y/N): ";
+            if (!(std::cin >> anotherOrder)) {
+                std::cin.clear();
+                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+                anotherOrder = 'N';
+            }
+        } while (anotherOrder == 'Y' || anotherOrder == 'y');
+
+        Receipt::print(bill);
+        Receipt::saveToFile(bill, receiptsFilename);
+        std::cout << "Receipt saved to " << receiptsFilename << std::endl;
+        return;
+    }
+
     int option = 0;
     do {
         std::cout << std::endl;
@@ -46,7 +66,12 @@ void OrderManager::run() {
 
         switch (option) {
             case 1: {
-                placeOrder();
+                if (placeOrder(staffId)) {
+                    std::vector<Order> bill(1, orders.back());
+                    Receipt::print(bill);
+                    Receipt::saveToFile(bill, receiptsFilename);
+                    std::cout << "Receipt saved to " << receiptsFilename << std::endl;
+                }
                 break;
             }
             case 2: {
@@ -90,6 +115,7 @@ void OrderManager::loadFromFile() {
         int quantity = 0;
         double unitPrice = 0.0;
         double total = 0.0;
+        int staffId = 0;
         std::string itemName;
         std::string createdAt;
 
@@ -106,12 +132,15 @@ void OrderManager::loadFromFile() {
             std::getline(ss, token, '|');
             total = std::stod(token);
             std::getline(ss, createdAt, '|');
+            if (std::getline(ss, token, '|')) {
+                staffId = std::stoi(token);
+            }
         } catch (const std::exception&) {
             std::cout << "Warning: skipping corrupted line in " << filename << "." << std::endl;
             continue;
         }
 
-        orders.push_back(Order(id, itemId, itemName, quantity, unitPrice, total, createdAt));
+        orders.push_back(Order(id, itemId, itemName, quantity, unitPrice, total, createdAt, staffId));
     }
     file.close();
 }
@@ -128,7 +157,7 @@ void OrderManager::saveToFile() {
     file.close();
 }
 
-void OrderManager::placeOrder() {
+bool OrderManager::placeOrder(int staffId) {
     MenuManager menuManager;
     menuManager.viewItems();
 
@@ -138,13 +167,13 @@ void OrderManager::placeOrder() {
         std::cin.clear();
         std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
         std::cout << "Invalid ID." << std::endl;
-        return;
+        return false;
     }
 
     MenuItem item;
     if (!menuManager.getItemById(itemId, item)) {
         std::cout << "Item with ID " << itemId << " not found." << std::endl;
-        return;
+        return false;
     }
 
     int quantity = 0;
@@ -153,15 +182,15 @@ void OrderManager::placeOrder() {
         std::cin.clear();
         std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
         std::cout << "Invalid quantity." << std::endl;
-        return;
+        return false;
     }
     if (quantity <= 0) {
         std::cout << "Quantity must be a positive number." << std::endl;
-        return;
+        return false;
     }
     if (quantity > item.getStock()) {
         std::cout << "Not enough stock. Available stock is " << item.getStock() << "." << std::endl;
-        return;
+        return false;
     }
 
     double total = quantity * item.getPrice();
@@ -175,23 +204,17 @@ void OrderManager::placeOrder() {
     nextId++;
 
     std::string createdAt = currentTimestamp();
-    orders.push_back(Order(nextId, item.getId(), item.getName(), quantity, item.getPrice(), total, createdAt));
+    orders.push_back(Order(nextId, item.getId(), item.getName(), quantity, item.getPrice(), total, createdAt, staffId));
 
     if (!menuManager.reduceStock(item.getId(), quantity)) {
         std::cout << "Failed to update stock. Order cancelled." << std::endl;
         orders.pop_back();
-        return;
+        return false;
     }
 
     saveToFile();
     std::cout << "Order placed successfully with ID " << std::setfill('0') << std::setw(4) << nextId << std::setfill(' ') << ". Total : " << total << std::endl;
-
-    std::cout << std::endl;
-    std::vector<Order> bill;
-    bill.push_back(orders.back());
-    Receipt::print(bill);
-    Receipt::saveToFile(bill, receiptsFilename);
-    std::cout << "Receipt saved to " << receiptsFilename << std::endl;
+    return true;
 }
 
 void OrderManager::viewOrders() {

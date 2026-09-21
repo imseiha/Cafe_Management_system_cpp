@@ -18,6 +18,7 @@
 #include <sstream>
 #include <limits>
 #include <algorithm>
+#include <cctype>
 
 
 // ============================================================
@@ -227,7 +228,7 @@ void StaffManager::viewStaff()
 // checks for duplicate username, creates the Staff object,
 // adds it to the vector, and saves to file.
 
-void StaffManager::createStaff()
+void StaffManager::createStaff(const std::string& role)
 {
     std::cout << "\n==========================================\n";
     std::cout << "              CREATE STAFF\n";
@@ -260,8 +261,15 @@ void StaffManager::createStaff()
     std::cout << "Enter Email: ";
     std::getline(std::cin, email);
 
-    std::cout << "Enter Position: ";
-    std::getline(std::cin, position);
+    if (role.empty())
+    {
+        std::cout << "Enter Position: ";
+        std::getline(std::cin, position);
+    }
+    else
+    {
+        position = role;
+    }
 
     std::cout << "Enter Username: ";
     std::getline(std::cin, username);
@@ -523,17 +531,12 @@ void StaffManager::searchStaff()
 // Prompts for username and password, searches staffData,
 // and displays the matched staff member's profile.
 
-void StaffManager::staffLogin()
+bool StaffManager::authenticate(Staff& authenticatedStaff, bool requireAdmin)
 {
-    std::cout << "\n==========================================\n";
-    std::cout << "              STAFF LOGIN\n";
-    std::cout << "==========================================\n";
-
     if (staffData.empty())
     {
         std::cout << "\nNo staff data found.\n";
-        std::cout << "Please create a staff first.\n";
-        return;
+        return false;
     }
 
     std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
@@ -554,25 +557,28 @@ void StaffManager::staffLogin()
     {
         if (staff.getUsername() == inputUsername && staff.getPassword() == inputPassword)
         {
+            std::string position = staff.getPosition();
+            std::transform(position.begin(), position.end(), position.begin(),
+                           [](unsigned char ch) { return static_cast<char>(std::tolower(ch)); });
+            if (requireAdmin && position != "admin")
+            {
+                std::cout << "\nThis account does not have administrator access.\n";
+                return false;
+            }
+            if (!requireAdmin && position == "admin")
+            {
+                std::cout << "\nPlease use Login As Admin for this account.\n";
+                return false;
+            }
+            authenticatedStaff = staff;
             std::cout << "\nLogin successfully!\n";
-
-            std::cout << "\n==========================================\n";
-            std::cout << "            MY PROFILE\n";
-            std::cout << "==========================================\n";
-
-            staff.display();
-
-            found = true;
-            break;
+            return true;
         }
     }
 
-    if (!found)
-    {
-        std::cout << "\nInvalid Username or Password!\n";
-    }
+    std::cout << "\nInvalid Username or Password!\n";
+    return false;
 }
-
 
 // ============================================================
 // SECTION 5: MENU
@@ -594,13 +600,12 @@ void StaffManager::staffMenu()
         std::cout << "             STAFF MANAGEMENT\n";
         std::cout << "==========================================\n";
 
-        std::cout << "1. Staff Login\n";
-        std::cout << "2. View Staff\n";
-        std::cout << "3. Create Staff\n";
-        std::cout << "4. Update Staff\n";
-        std::cout << "5. Delete Staff\n";
-        std::cout << "6. Search Staff\n";
-        std::cout << "7. Exit\n";
+        std::cout << "1. View Staff\n";
+        std::cout << "2. Create Staff\n";
+        std::cout << "3. Update Staff\n";
+        std::cout << "4. Delete Staff\n";
+        std::cout << "5. Search Staff\n";
+        std::cout << "6. Exit\n";
 
         std::cout << "==========================================\n";
 
@@ -610,14 +615,13 @@ void StaffManager::staffMenu()
 
         switch (choice)
         {
-            case 1: staffLogin();   break;
-            case 2: viewStaff();    break;
-            case 3: createStaff();  break;
-            case 4: updateStaff();  break;
-            case 5: deleteStaff();  break;
-            case 6: searchStaff();  break;
+            case 1: viewStaff();    break;
+            case 2: createStaff();  break;
+            case 3: updateStaff();  break;
+            case 4: deleteStaff();  break;
+            case 5: searchStaff();  break;
 
-            case 7:
+            case 6:
                 std::cout << "\nExiting Staff Management...\n";
                 break;
 
@@ -625,5 +629,5 @@ void StaffManager::staffMenu()
                 std::cout << "\nInvalid option!\n";
         }
 
-    } while (choice != 7);
+    } while (choice != 6);
 }

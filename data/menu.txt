@@ -1,6 +1,4 @@
-1|Donunt|Pastrires|1|0|47
-2|Iced Coffee|Beverages|2.5|0|0
+1|Donunt|Pastrires|1|0.75|95
+2|ced Coffee|Beverages|2.5|1|45
 3|Cake, Chocolate|Dessert|3|0|0
 4|Test|Drink|12|0|0
-5|||3|0|3
-6|h|drink|2.5|1|5

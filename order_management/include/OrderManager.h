@@ -13,13 +13,14 @@ private:
 
     void loadFromFile();
     void saveToFile();
-    void placeOrder();
+    bool placeOrder(int staffId = 0);
     void viewOrders();
     void deleteOrder();
     void viewAllReceipts();
 
 public:
-    void run();
+    // Staff mode opens the order form directly.
+    void run(bool staffMode = false, int staffId = 0);
 };
 
 #endif

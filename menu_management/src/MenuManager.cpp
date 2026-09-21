@@ -4,6 +4,7 @@
 #include <iomanip>
 #include <limits>
 #include <algorithm>
+#include <cctype>
 #include <windows.h>
 #include "MenuManager.h"
 
@@ -17,6 +18,60 @@ static std::string csvField(const std::string& value) {
     return "\"" + escaped + "\"";
 }
 
+static std::string money(double value) {
+    std::ostringstream out;
+    out << "$" << std::fixed << std::setprecision(2) << value;
+    return out.str();
+}
+
+static std::string stockStatus(int stock) {
+    if (stock == 0) return "OUT OF STOCK";
+    if (stock <= 5) return "LOW STOCK";
+    return "IN STOCK";
+}
+
+static void printBorder() {
+    std::cout << "=================================================================================================\n";
+}
+
+static void printTableHeader() {
+    printBorder();
+    std::cout << std::left
+              << std::setw(6) << "ID"
+              << std::setw(24) << "NAME"
+              << std::setw(18) << "CATEGORY"
+              << std::setw(12) << "PRICE"
+              << std::setw(15) << "PRODUCT COST"
+              << std::setw(8) << "STOCK"
+              << "STATUS\n";
+    printBorder();
+}
+
+static void printItemRow(const MenuItem& item) {
+    std::cout << std::left
+              << std::setw(6) << item.getId()
+              << std::setw(24) << item.getName().substr(0, 23)
+              << std::setw(18) << item.getCategory().substr(0, 17)
+              << std::setw(12) << money(item.getPrice())
+              << std::setw(15) << money(item.getProductCost())
+              << std::setw(8) << item.getStock()
+              << stockStatus(item.getStock()) << "\n";
+}
+
+static void printProductDetails(const MenuItem& item) {
+    std::cout << "\n===============================================================\n";
+    std::cout << "PRODUCT DETAILS\n";
+    std::cout << "===============================================================\n";
+    std::cout << "ID           : " << item.getId() << "\n";
+    std::cout << "Name         : " << item.getName() << "\n";
+    std::cout << "Category     : " << item.getCategory() << "\n";
+    std::cout << "Selling Price: " << money(item.getPrice()) << "\n";
+    std::cout << "Product Cost : " << money(item.getProductCost()) << "\n";
+    std::cout << "Stock        : " << item.getStock() << "\n";
+    std::cout << "Status       : " << stockStatus(item.getStock()) << "\n";
+    std::cout << "===============================================================\n";
+}
+
 MenuManager::MenuManager() {
     loadFromFile();
 }
@@ -25,16 +80,14 @@ void MenuManager::run() {
     loadFromFile();
     int option = 0;
     do {
-        std::cout << std::endl;
-        std::cout << "===== Menu Management =====" << std::endl;
-        std::cout << "1.Add Item" << std::endl;
-        std::cout << "2.View Items" << std::endl;
-        std::cout << "3.Update Item" << std::endl;
-        std::cout << "4.Delete Item" << std::endl;
-        std::cout << "5.Export to Excel" << std::endl;
-        std::cout << "6.Back" << std::endl;
-        std::cout << "===========================" << std::endl;
-        std::cout << "Enter your option : ";
+        std::cout << "\n===============================================================\n";
+        std::cout << "MENU MANAGEMENT\n";
+        std::cout << "===============================================================\n";
+        viewItems();
+        std::cout << "Total Products: " << items.size() << "\n\n";
+        std::cout << "[1] Add Product\n[2] Edit Product\n[3] Delete Product\n";
+        std::cout << "[4] Search Product\n[5] View Product\n[6] Export to Excel\n[7] Back\n";
+        std::cout << "Enter your choice: ";
         if (!(std::cin >> option)) {
             if (std::cin.eof()) {
                 break;
@@ -51,22 +104,26 @@ void MenuManager::run() {
                 break;
             }
             case 2: {
-                viewItems();
-                break;
-            }
-            case 3: {
                 updateItem();
                 break;
             }
-            case 4: {
+            case 3: {
                 deleteItem();
                 break;
             }
+            case 4: {
+                searchItems();
+                break;
+            }
             case 5: {
-                exportToExcel();
+                viewProduct();
                 break;
             }
             case 6: {
+                exportToExcel();
+                break;
+            }
+            case 7: {
                 break;
             }
             default: {
@@ -74,7 +131,7 @@ void MenuManager::run() {
                 break;
             }
         }
-    } while (option != 6);
+    } while (option != 7);
 }
 
 void MenuManager::loadFromFile() {
@@ -153,47 +210,70 @@ void MenuManager::addItem() {
     }
     nextId++;
 
-    std::cout << "Enter item name : ";
-    std::cin.ignore();
+    std::cout << "\n===============================================================\nADD NEW PRODUCT\n===============================================================\n";
+    std::cout << "Name: ";
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     std::getline(std::cin, name);
-    std::cout << "Enter category : ";
-    std::getline(std::cin, category);
-    std::cout << "Enter product cost : ";
-    if (!(std::cin >> productCost)) {
-        std::cin.clear();
-        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-        std::cout << "Invalid product cost. Item not added." << std::endl;
+    if (name.empty()) {
+        std::cout << "Product name cannot be empty.\n";
         return;
     }
-    std::cout << "Enter price : ";
+    std::cout << "Category: ";
+    std::getline(std::cin, category);
+    std::cout << "Price: ";
     if (!(std::cin >> price)) {
         std::cin.clear();
         std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-        std::cout << "Invalid price. Item not added." << std::endl;
+        std::cout << "Invalid price. Product not added.\n";
         return;
     }
-    std::cout << "Enter stock : ";
+    std::cout << "Product Cost: ";
+    if (!(std::cin >> productCost)) {
+        std::cin.clear();
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        std::cout << "Invalid product cost. Product not added.\n";
+        return;
+    }
+    std::cout << "Stock: ";
     if (!(std::cin >> stock)) {
         std::cin.clear();
         std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-        std::cout << "Invalid stock. Item not added." << std::endl;
+        std::cout << "Invalid stock. Product not added.\n";
+        return;
+    }
+    if (price < 0 || productCost < 0 || stock < 0) {
+        std::cout << "Price, product cost, and stock cannot be negative.\n";
+        return;
+    }
+
+    int saveChoice = 0;
+    std::cout << "\n[1] Save\n[2] Cancel\nEnter your choice: ";
+    if (!(std::cin >> saveChoice) || (saveChoice != 1 && saveChoice != 2)) {
+        std::cin.clear();
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        std::cout << "Invalid choice. Product not added.\n";
+        return;
+    }
+    if (saveChoice == 2) {
+        std::cout << "Product creation cancelled.\n";
         return;
     }
 
     items.push_back(MenuItem(nextId, name, category, price, productCost, stock));
     saveToFile();
-    std::cout << "Item added successfully with ID " << nextId << "." << std::endl;
+    std::cout << "Product added successfully with ID " << nextId << ".\n";
 }
 
 void MenuManager::viewItems() {
     if (items.empty()) {
-        std::cout << "No menu items found." << std::endl;
+        std::cout << "No products found.\n";
         return;
     }
-    std::cout << "ID\tName\tCategory\tPrice\tProduct Cost\tStock" << std::endl;
+    printTableHeader();
     for (const MenuItem& item : items) {
-        item.display();
+        printItemRow(item);
     }
+    printBorder();
 }
 
 bool MenuManager::getItemById(int id, MenuItem& item) const {
@@ -227,7 +307,7 @@ void MenuManager::updateItem() {
     }
     viewItems();
     int id = 0;
-    std::cout << "Enter item ID to update : ";
+    std::cout << "Enter Product ID to edit: ";
     if (!(std::cin >> id)) {
         std::cin.clear();
         std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
@@ -243,30 +323,37 @@ void MenuManager::updateItem() {
             double productCost = 0.0;
             int stock = 0;
 
-            std::cout << "Enter new name : ";
-            std::cin.ignore();
+            std::cout << "\n===============================================================\nEDIT PRODUCT\n===============================================================\n";
+            printProductDetails(item);
+            std::cout << "Enter the new values.\nName: ";
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
             std::getline(std::cin, name);
-            std::cout << "Enter new category : ";
+            std::cout << "Category: ";
             std::getline(std::cin, category);
-            std::cout << "Enter new price : ";
+            std::cout << "Price: ";
             if (!(std::cin >> price)) {
                 std::cin.clear();
                 std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
                 std::cout << "Invalid price. Item not updated." << std::endl;
                 return;
             }
-            std::cout << "Enter new product cost : ";
+            std::cout << "Product Cost: ";
             if (!(std::cin >> productCost)) {
                 std::cin.clear();
                 std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
                 std::cout << "Invalid product cost. Item not updated." << std::endl;
                 return;
             }
-            std::cout << "Enter new stock : ";
+            std::cout << "Stock: ";
             if (!(std::cin >> stock)) {
                 std::cin.clear();
                 std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
                 std::cout << "Invalid stock. Item not updated." << std::endl;
+                return;
+            }
+
+            if (name.empty() || price < 0 || productCost < 0 || stock < 0) {
+                std::cout << "Name cannot be empty and numeric values cannot be negative. Product not updated.\n";
                 return;
             }
 
@@ -276,7 +363,7 @@ void MenuManager::updateItem() {
             item.setProductCost(productCost);
             item.setStock(stock);
             saveToFile();
-            std::cout << "Item updated successfully." << std::endl;
+            std::cout << "Product updated successfully." << std::endl;
             return;
         }
     }
@@ -290,7 +377,7 @@ void MenuManager::deleteItem() {
     }
     viewItems();
     int id = 0;
-    std::cout << "Enter item ID to delete : ";
+    std::cout << "Enter Product ID to delete: ";
     if (!(std::cin >> id)) {
         std::cin.clear();
         std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
@@ -300,13 +387,78 @@ void MenuManager::deleteItem() {
 
     for (std::vector<MenuItem>::iterator it = items.begin(); it != items.end(); ++it) {
         if (it->getId() == id) {
+            printProductDetails(*it);
+            int confirmation = 0;
+            std::cout << "Are you sure you want to delete this product?\n[1] Yes\n[2] No\nEnter your choice: ";
+            if (!(std::cin >> confirmation) || (confirmation != 1 && confirmation != 2)) {
+                std::cin.clear();
+                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+                std::cout << "Invalid choice. Product was not deleted.\n";
+                return;
+            }
+            if (confirmation == 2) {
+                std::cout << "Product deletion cancelled.\n";
+                return;
+            }
             items.erase(it);
             saveToFile();
-            std::cout << "Item deleted successfully." << std::endl;
+            std::cout << "Product deleted successfully." << std::endl;
             return;
         }
     }
     std::cout << "Item with ID " << id << " not found." << std::endl;
+}
+
+void MenuManager::searchItems() {
+    std::cout << "\n===============================================================\nSEARCH PRODUCT\n===============================================================\n";
+    std::cout << "Search by ID, name, or category: ";
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    std::string query;
+    std::getline(std::cin, query);
+    std::transform(query.begin(), query.end(), query.begin(),
+                   [](unsigned char ch) { return static_cast<char>(std::tolower(ch)); });
+
+    std::vector<MenuItem> results;
+    for (const MenuItem& item : items) {
+        std::string name = item.getName();
+        std::string category = item.getCategory();
+        std::transform(name.begin(), name.end(), name.begin(),
+                       [](unsigned char ch) { return static_cast<char>(std::tolower(ch)); });
+        std::transform(category.begin(), category.end(), category.begin(),
+                       [](unsigned char ch) { return static_cast<char>(std::tolower(ch)); });
+        if (std::to_string(item.getId()).find(query) != std::string::npos ||
+            name.find(query) != std::string::npos || category.find(query) != std::string::npos) {
+            results.push_back(item);
+        }
+    }
+
+    if (results.empty()) {
+        std::cout << "No products found.\n";
+        return;
+    }
+    printTableHeader();
+    for (const MenuItem& item : results) printItemRow(item);
+    printBorder();
+}
+
+void MenuManager::viewProduct() {
+    int id = 0;
+    std::cout << "Enter Product ID to view: ";
+    if (!(std::cin >> id)) {
+        std::cin.clear();
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        std::cout << "Invalid ID.\n";
+        return;
+    }
+    MenuItem item;
+    if (!getItemById(id, item)) {
+        std::cout << "Product with ID " << id << " not found.\n";
+        return;
+    }
+    printProductDetails(item);
+    std::cout << "Press Enter to continue...";
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    std::cin.get();
 }
 
 void MenuManager::exportToExcel() {

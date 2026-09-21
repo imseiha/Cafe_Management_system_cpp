@@ -16,6 +16,8 @@ private:
     void addItem();
     void updateItem();
     void deleteItem();
+    void searchItems();
+    void viewProduct();
     void exportToExcel();
 
 public:

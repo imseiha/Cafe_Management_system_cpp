@@ -134,6 +134,32 @@ std::string amountLine(const std::string& label, double amount) {
     return labelValueLine(label, money(amount));
 }
 
+struct ReceiptItem {
+    int itemId;
+    std::string name;
+    int quantity;
+    double amount;
+};
+
+std::vector<ReceiptItem> combineItems(const std::vector<Order>& orders) {
+    std::vector<ReceiptItem> items;
+    for (const Order& order : orders) {
+        bool found = false;
+        for (ReceiptItem& item : items) {
+            if (item.itemId == order.getItemId()) {
+                item.quantity += order.getQuantity();
+                item.amount += order.getTotal();
+                found = true;
+                break;
+            }
+        }
+        if (!found) {
+            items.push_back({order.getItemId(), order.getItemName(), order.getQuantity(), order.getTotal()});
+        }
+    }
+    return items;
+}
+
 std::string buildReceipt(const std::vector<Order>& orders) {
     std::ostringstream out;
 
@@ -162,6 +188,9 @@ std::string buildReceipt(const std::vector<Order>& orders) {
     orderId << compactDateTime() << std::setfill('0') << std::setw(3) << (receiptNo % 1000);
     out << labelValueLine("Order ID:", orderId.str()) << "\n";
     out << labelValueLine("Date:", currentDateTime()) << "\n";
+    if (!orders.empty() && orders.front().getStaffId() > 0) {
+        out << labelValueLine("Staff ID:", std::to_string(orders.front().getStaffId())) << "\n";
+    }
 
     out << midBorder() << "\n";
     out << boxLine(padRight("Item", 27)
@@ -169,8 +198,9 @@ std::string buildReceipt(const std::vector<Order>& orders) {
                    + "  " + padLeft("Amount", 12)) << "\n";
     out << midBorder() << "\n";
 
-    for (const Order& order : orders) {
-        out << itemRowLine(order.getItemName(), order.getQuantity(), order.getTotal()) << "\n";
+    const std::vector<ReceiptItem> items = combineItems(orders);
+    for (const ReceiptItem& item : items) {
+        out << itemRowLine(item.name, item.quantity, item.amount) << "\n";
         out << midBorder() << "\n";
     }
 

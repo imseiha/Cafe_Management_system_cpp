@@ -21,9 +21,12 @@ private:
 public:
     StaffManager();
 
-    void staffLogin();
+    // Authenticates against the existing staff data file. Admin access is
+    // granted only to staff whose position is "Admin".
+    bool authenticate(Staff& authenticatedStaff, bool requireAdmin);
     void viewStaff();
-    void createStaff();
+    // A non-empty role creates the account with that role without prompting.
+    void createStaff(const std::string& role = "");
     void updateStaff();
     void deleteStaff();
     void searchStaff();

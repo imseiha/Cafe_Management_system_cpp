@@ -3,10 +3,10 @@
 #include <iomanip>
 #include "Order.h"
 
-Order::Order() : id(0), itemId(0), itemName(""), quantity(0), unitPrice(0.0), total(0.0), createdAt("") {}
+Order::Order() : id(0), itemId(0), itemName(""), quantity(0), unitPrice(0.0), total(0.0), createdAt(""), staffId(0) {}
 
-Order::Order(int id, int itemId, const std::string& itemName, int quantity, double unitPrice, double total, const std::string& createdAt)
-    : id(id), itemId(itemId), itemName(itemName), quantity(quantity), unitPrice(unitPrice), total(total), createdAt(createdAt) {}
+Order::Order(int id, int itemId, const std::string& itemName, int quantity, double unitPrice, double total, const std::string& createdAt, int staffId)
+    : id(id), itemId(itemId), itemName(itemName), quantity(quantity), unitPrice(unitPrice), total(total), createdAt(createdAt), staffId(staffId) {}
 
 int Order::getId() const {
     return id;
@@ -34,6 +34,10 @@ double Order::getTotal() const {
 
 std::string Order::getCreatedAt() const {
     return createdAt;
+}
+
+int Order::getStaffId() const {
+    return staffId;
 }
 
 void Order::setId(int id) {
@@ -64,9 +68,13 @@ void Order::setCreatedAt(const std::string& createdAt) {
     this->createdAt = createdAt;
 }
 
+void Order::setStaffId(int staffId) {
+    this->staffId = staffId;
+}
+
 std::string Order::toFileString() const {
     std::ostringstream oss;
-    oss << id << "|" << itemId << "|" << itemName << "|" << quantity << "|" << unitPrice << "|" << total << "|" << createdAt;
+    oss << id << "|" << itemId << "|" << itemName << "|" << quantity << "|" << unitPrice << "|" << total << "|" << createdAt << "|" << staffId;
     return oss.str();
 }
 

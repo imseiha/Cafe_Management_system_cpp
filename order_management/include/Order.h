@@ -12,10 +12,11 @@ private:
     double unitPrice;
     double total;
     std::string createdAt;
+    int staffId;
 
 public:
     Order();
-    Order(int id, int itemId, const std::string& itemName, int quantity, double unitPrice, double total, const std::string& createdAt);
+    Order(int id, int itemId, const std::string& itemName, int quantity, double unitPrice, double total, const std::string& createdAt, int staffId = 0);
 
     int getId() const;
     int getItemId() const;
@@ -24,6 +25,7 @@ public:
     double getUnitPrice() const;
     double getTotal() const;
     std::string getCreatedAt() const;
+    int getStaffId() const;
 
     void setId(int id);
     void setItemId(int itemId);
@@ -32,6 +34,7 @@ public:
     void setUnitPrice(double unitPrice);
     void setTotal(double total);
     void setCreatedAt(const std::string& createdAt);
+    void setStaffId(int staffId);
 
     std::string toFileString() const;
     void display() const;
