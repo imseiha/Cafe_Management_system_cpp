@@ -493,20 +493,44 @@ void StaffManager::searchStaff()
     std::getline(std::cin, keyword);
 
 
+    if (keyword.empty())
+    {
+        std::cout << "\nSearch keyword cannot be empty.\n";
+        return;
+    }
+
+    bool keywordIsNumber = std::all_of(keyword.begin(), keyword.end(),
+                                       [](unsigned char ch) { return std::isdigit(ch); });
+
     bool found = false;
 
     for (const auto& staff : staffData)
     {
-        std::string id = std::to_string(staff.getId());
+        bool matches = false;
 
-        if (
-            id.find(keyword)                   != std::string::npos ||
-            staff.getName().find(keyword)       != std::string::npos ||
-            staff.getGender().find(keyword)     != std::string::npos ||
-            staff.getPhoneNumber().find(keyword) != std::string::npos ||
-            staff.getEmail().find(keyword)      != std::string::npos ||
-            staff.getPosition().find(keyword)   != std::string::npos
-        )
+        if (keywordIsNumber)
+        {
+            try
+            {
+                matches = staff.getId() == std::stoi(keyword) ||
+                          staff.getPhoneNumber() == keyword ||
+                          staff.getSalary() == keyword;
+            }
+            catch (...)
+            {
+                matches = false;
+            }
+        }
+        else
+        {
+            matches =
+                staff.getName().find(keyword)       != std::string::npos ||
+                staff.getGender().find(keyword)     != std::string::npos ||
+                staff.getEmail().find(keyword)      != std::string::npos ||
+                staff.getPosition().find(keyword)   != std::string::npos;
+        }
+
+        if (matches)
         {
             staff.display();
             found = true;
