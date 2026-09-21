@@ -59,9 +59,9 @@ To compile run this command inside the project root folder
 The exe is created at build cafe_system.exe
 
 To compile and then run the program use this command instead
+ mingw32-make run
 
-    mingw32-make run
-
+   
 Extra command to delete the exe if you want a clean state
 
     -mingw32-make clean

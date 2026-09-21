@@ -57,7 +57,7 @@ int main() {
                 break;
             }
             case 5: {
-                FinanceManager financeManager;
+                FinancialManager financeManager;
                 financeManager.run();
                 break;
             }

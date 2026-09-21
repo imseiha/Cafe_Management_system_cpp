@@ -3,3 +3,6 @@
 3|Cake, Chocolate|Dessert|3|0
 4|Test|Drink|12|0
 5|||3|3
+6|Coffee|Drink|2|8
+7|coffee|Drink|2|6
+8|Tea|Drink|1|7
