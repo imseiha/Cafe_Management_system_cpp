@@ -24,6 +24,8 @@ public:
     void ReadExpense();
     void UpdateExpense();
     void DeleteExpense();
+    void viewStaffSummary();
+    void viewProfit();
     void viewSummary();
 };
 

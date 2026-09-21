@@ -14,6 +14,179 @@ FinancialManager::FinancialManager()
 {
 }
 
+static double manualIncomeTotal()
+{
+    std::ifstream file("data/income.txt");
+
+    if (!file.is_open())
+    {
+        return 0.0;
+    }
+
+    std::string line;
+    double total = 0.0;
+
+    while (std::getline(file, line))
+    {
+        if (line.empty())
+        {
+            continue;
+        }
+
+        std::stringstream ss(line);
+
+        std::string token;
+
+        std::getline(ss, token, '|');
+        std::getline(ss, token, '|');
+        std::getline(ss, token, '|');
+
+        try
+        {
+            total += std::stod(token);
+        }
+        catch (...)
+        {
+        }
+    }
+
+    file.close();
+    return total;
+}
+
+static int nextIdFromFile(const std::string& filename)
+{
+    std::ifstream file(filename);
+
+    if (!file.is_open())
+    {
+        return 1;
+    }
+
+    int nextId = 1;
+    std::string line;
+
+    while (std::getline(file, line))
+    {
+        if (line.empty())
+        {
+            continue;
+        }
+
+        std::stringstream ss(line);
+        std::string token;
+        std::getline(ss, token, '|');
+
+        try
+        {
+            int id = std::stoi(token);
+            if (id >= nextId)
+            {
+                nextId = id + 1;
+            }
+        }
+        catch (...)
+        {
+        }
+    }
+
+    file.close();
+    return nextId;
+}
+
+struct StaffSummary
+{
+    int count = 0;
+    double totalSalary = 0.0;
+};
+
+static StaffSummary readStaffSummary()
+{
+    StaffSummary summary;
+
+    std::ifstream file("data/staff.txt");
+
+    if (!file.is_open())
+    {
+        return summary;
+    }
+
+    std::string line;
+
+    while (std::getline(file, line))
+    {
+        if (line.empty())
+        {
+            continue;
+        }
+
+        std::stringstream ss(line);
+        std::string token;
+        int field = 0;
+
+        while (std::getline(ss, token, '|'))
+        {
+            ++field;
+
+            if (field == 12)
+            {
+                try
+                {
+                    summary.totalSalary += std::stod(token);
+                }
+                catch (...)
+                {
+                }
+                break;
+            }
+        }
+
+        ++summary.count;
+    }
+
+    file.close();
+    return summary;
+}
+
+static double expenseTotalFromFile()
+{
+    std::ifstream file("data/expense.txt");
+
+    if (!file.is_open())
+    {
+        return 0.0;
+    }
+
+    std::string line;
+    double total = 0.0;
+
+    while (std::getline(file, line))
+    {
+        if (line.empty())
+        {
+            continue;
+        }
+
+        std::stringstream ss(line);
+        std::string token;
+
+        std::getline(ss, token, '|');
+        std::getline(ss, token, '|');
+        std::getline(ss, token, '|');
+
+        try
+        {
+            total += std::stod(token);
+        }
+        catch (...)
+        {
+        }
+    }
+
+    file.close();
+    return total;
+}
+
 void FinancialManager::calculateSales()
 {
     totalSales = 0.0;
@@ -70,16 +243,14 @@ void FinancialManager::calculateSales()
 
     file.close();
 }
+
 void FinancialManager::AddIncome()
 {
-    int id;
+    int id = nextIdFromFile("data/income.txt");
     std::string description;
     double amount;
 
     std::cout << "\n========== ADD INCOME ==========\n";
-
-    std::cout << "Enter Income ID: ";
-    std::cin >> id;
 
     std::cin.ignore();
 
@@ -103,7 +274,7 @@ void FinancialManager::AddIncome()
 
     file.close();
 
-    std::cout << "Income added successfully!\n";
+    std::cout << "Income added successfully! (ID: " << id << ")\n";
 }
 void FinancialManager::ReadIncome()
 {
@@ -295,14 +466,11 @@ void FinancialManager::addExpense() // Spending
 }
 void FinancialManager::AddExpense()
 {
-    int id;
+    int id = nextIdFromFile("data/expense.txt");
     std::string description;
     double amount;
 
     std::cout << "\n========== ADD EXPENSE ==========\n";
-
-    std::cout << "Enter Expense ID: ";
-    std::cin >> id;
 
     std::cin.ignore();
 
@@ -345,7 +513,7 @@ void FinancialManager::AddExpense()
 
     totalExpense += amount;
 
-    std::cout << "Expense added successfully!\n";
+    std::cout << "Expense added successfully! (ID: " << id << ")\n";
 }
 
 void FinancialManager::ReadExpense()
@@ -539,41 +707,237 @@ void FinancialManager::DeleteExpense()
     }
 }
 
+void FinancialManager::viewStaffSummary()
+{
+    StaffSummary staffData = readStaffSummary();
+
+    std::cout << "\n========== STAFF SUMMARY ==========\n";
+    std::cout << "Total Staff     : " << staffData.count << std::endl;
+    std::cout << "Total Salary    : $" << std::fixed << std::setprecision(2)
+              << staffData.totalSalary << std::endl;
+    std::cout << "===================================\n";
+}
+
+void FinancialManager::viewProfit()
+{
+    calculateSales();
+
+    double manualIncome = manualIncomeTotal();
+    double totalIncome = totalSales + manualIncome;
+
+    StaffSummary staffData = readStaffSummary();
+    double totalExpense = staffData.totalSalary + expenseTotalFromFile();
+
+    double profit = totalIncome - totalExpense;
+
+    std::cout << std::fixed << std::setprecision(2);
+
+    std::cout << "\n========== PROFIT ==========\n";
+    std::cout << "Total Income    : $" << totalIncome << std::endl;
+    std::cout << "Total Expenses  : $" << totalExpense << std::endl;
+    std::cout << "Profit          : $" << profit << std::endl;
+    std::cout << "============================\n";
+}
+
 void FinancialManager::viewSummary()
 {
     calculateSales();
 
-    double profit = totalSales - totalExpense;
+    double manualIncome = manualIncomeTotal();
+    double totalIncome = totalSales + manualIncome;
+
+    StaffSummary staffData = readStaffSummary();
+    double otherExpense = expenseTotalFromFile();
+    double totalExpense = staffData.totalSalary + otherExpense;
+
+    double profit = totalIncome - totalExpense;
 
     std::cout << "\n========== FINANCIAL SUMMARY ==========\n";
 
     std::cout << std::fixed << std::setprecision(2);
 
-    std::cout << "INcome    : $" << totalSales << std::endl;
-    std::cout << "Total Expenses : $" << totalExpense << std::endl;
-    std::cout << "Profit         : $" << profit << std::endl;
+    std::cout << "Revenue         : $" << totalSales << std::endl;
+    std::cout << "Manual Income   : $" << manualIncome << std::endl;
+    std::cout << "Total Income    : $" << totalIncome << std::endl;
+    std::cout << "Staff Salary    : $" << staffData.totalSalary << std::endl;
+    std::cout << "Other Expenses  : $" << otherExpense << std::endl;
+    std::cout << "Total Expenses  : $" << totalExpense << std::endl;
+    std::cout << "Profit          : $" << profit << std::endl;
 
     std::cout << "=======================================\n";
 }
 
 void FinancialManager::run()
 {
-    int option;
+    int option = 0;
+
+    auto incomeMenu = [this]() {
+        int sub = 0;
+
+        do
+        {
+            std::cout << "\n========== INCOME MANAGEMENT ==========\n";
+            std::cout << "1. View Revenue\n";
+            std::cout << "2. Add Income\n";
+            std::cout << "3. View Income\n";
+            std::cout << "4. Update Income\n";
+            std::cout << "5. Delete Income\n";
+            std::cout << "6. Back\n";
+            std::cout << "======================================\n";
+            std::cout << "Enter your option : ";
+
+            std::cin >> sub;
+
+            if (std::cin.fail())
+            {
+                std::cin.clear();
+                std::cin.ignore(
+                    std::numeric_limits<std::streamsize>::max(),
+                    '\n');
+                std::cout << "Invalid option.\n";
+                continue;
+            }
+
+            switch (sub)
+            {
+            case 1:
+            {
+                calculateSales();
+
+                double manualIncome = manualIncomeTotal();
+                double totalIncome = totalSales + manualIncome;
+
+                std::cout << std::fixed << std::setprecision(2);
+                std::cout << "\nRevenue         : $" << totalSales << std::endl;
+                std::cout << "Manual Income   : $" << manualIncome << std::endl;
+                std::cout << "Total Income    : $" << totalIncome << std::endl;
+                std::cout << "\nPress Enter to return...";
+                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+                std::cin.get();
+                break;
+            }
+            case 2:
+                AddIncome();
+                break;
+            case 3:
+                ReadIncome();
+                break;
+            case 4:
+                UpdateIncome();
+                break;
+            case 5:
+                DeleteIncome();
+                break;
+            case 6:
+                break;
+            default:
+                std::cout << "Invalid option. Please try again.\n";
+                break;
+            }
+        } while (sub != 6);
+    };
+
+    auto expenseMenu = [this]() {
+        int sub = 0;
+
+        do
+        {
+            std::cout << "\n========== EXPENSE MANAGEMENT ==========\n";
+            std::cout << "1. Add Expense\n";
+            std::cout << "2. View Expense\n";
+            std::cout << "3. Update Expense\n";
+            std::cout << "4. Delete Expense\n";
+            std::cout << "5. Back\n";
+            std::cout << "=======================================\n";
+            std::cout << "Enter your option : ";
+
+            std::cin >> sub;
+
+            if (std::cin.fail())
+            {
+                std::cin.clear();
+                std::cin.ignore(
+                    std::numeric_limits<std::streamsize>::max(),
+                    '\n');
+                std::cout << "Invalid option.\n";
+                continue;
+            }
+
+            switch (sub)
+            {
+            case 1:
+                AddExpense();
+                break;
+            case 2:
+                ReadExpense();
+                break;
+            case 3:
+                UpdateExpense();
+                break;
+            case 4:
+                DeleteExpense();
+                break;
+            case 5:
+                break;
+            default:
+                std::cout << "Invalid option. Please try again.\n";
+                break;
+            }
+        } while (sub != 5);
+    };
+
+    auto reportMenu = [this]() {
+        int sub = 0;
+
+        do
+        {
+            std::cout << "\n========== FINANCIAL REPORTS ==========\n";
+            std::cout << "1. View Staff Summary\n";
+            std::cout << "2. View Profit\n";
+            std::cout << "3. View Financial Summary\n";
+            std::cout << "4. Back\n";
+            std::cout << "=======================================\n";
+            std::cout << "Enter your option : ";
+
+            std::cin >> sub;
+
+            if (std::cin.fail())
+            {
+                std::cin.clear();
+                std::cin.ignore(
+                    std::numeric_limits<std::streamsize>::max(),
+                    '\n');
+                std::cout << "Invalid option.\n";
+                continue;
+            }
+
+            switch (sub)
+            {
+            case 1:
+                viewStaffSummary();
+                break;
+            case 2:
+                viewProfit();
+                break;
+            case 3:
+                viewSummary();
+                break;
+            case 4:
+                break;
+            default:
+                std::cout << "Invalid option. Please try again.\n";
+                break;
+            }
+        } while (sub != 4);
+    };
 
     do
     {
         std::cout << "\n========== FINANCIAL MANAGEMENT ==========\n";
-        std::cout << "1. View Sales Income\n";
-        std::cout << "2. Add Income\n";
-        std::cout << "3. View Income\n";
-        std::cout << "4. Update Income\n";
-        std::cout << "5. Delete Income\n";
-        std::cout << "6. Add Expense\n";
-        std::cout << "7. View Expense\n";
-        std::cout << "8. Update Expense\n";
-        std::cout << "9. Delete Expense\n";
-        std::cout << "10. View Financial Summary\n";
-        std::cout << "11. Back\n";
+        std::cout << "1. Income Management\n";
+        std::cout << "2. Expense Management\n";
+        std::cout << "3. Financial Reports\n";
+        std::cout << "4. Back\n";
         std::cout << "==========================================\n";
         std::cout << "Enter your option : ";
 
@@ -593,84 +957,20 @@ void FinancialManager::run()
         switch (option)
         {
         case 1:
-        {
-            calculateSales();
-
-            std::cout << std::fixed
-                      << std::setprecision(2);
-
-            std::cout << "\nSales Income : $"
-                      << totalSales
-                      << std::endl;
-
+            incomeMenu();
             break;
-        }
-
         case 2:
-        {
-            AddIncome();
+            expenseMenu();
             break;
-        }
-
         case 3:
-        {
-            ReadIncome();
+            reportMenu();
             break;
-        }
-
         case 4:
-        {
-            UpdateIncome();
-            break;
-        }
-
-        case 5:
-        {
-            DeleteIncome();
-            break;
-        }
-
-        case 6:
-        {
-            AddExpense();
-            break;
-        }
-
-        case 7:
-        {
-            ReadExpense();
-            break;
-        }
-
-        case 8:
-        {
-            UpdateExpense();
-            break;
-        }
-
-        case 9:
-        {
-            DeleteExpense();
-            break;
-        }
-
-        case 10:
-        {
-            viewSummary();
-            break;
-        }
-
-        case 11:
-        {
             std::cout << "Back to Main Menu...\n";
             break;
-        }
-
         default:
-        {
             std::cout << "Invalid option. Please try again.\n";
             break;
         }
-        }
-    } while (option != 11);
+    } while (option != 4);
 }
